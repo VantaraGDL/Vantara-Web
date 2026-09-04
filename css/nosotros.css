@@ -1,0 +1,138 @@
+.about {
+    padding: 0 5% 7rem;
+}
+
+
+/* HERO */
+
+.about-hero {
+    min-height: 65vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    max-width: 1000px;
+}
+
+.about-label {
+    margin-bottom: 1rem;
+
+    color: #929292;
+
+    font-size: 0.75rem;
+    letter-spacing: 0.2rem;
+}
+
+.about-hero h1 {
+    margin-bottom: 2rem;
+
+    font-size: clamp(
+        3rem,
+        7vw,
+        6rem
+    );
+
+    line-height: 1;
+
+    text-transform: uppercase;
+}
+
+.about-intro {
+    max-width: 650px;
+
+    color: #aaaaaa;
+
+    font-size: 1.2rem;
+    line-height: 1.7;
+}
+
+
+/* CONTENIDO */
+
+.about-content {
+    border-top: 1px solid #262626;
+}
+
+.about-block {
+    display: grid;
+
+    grid-template-columns:
+        100px minmax(0, 700px);
+
+    gap: 3rem;
+
+    padding: 4rem 0;
+
+    border-bottom: 1px solid #262626;
+}
+
+.about-number {
+    color: #777777;
+
+    font-size: 0.8rem;
+    letter-spacing: 0.1rem;
+}
+
+.about-block h2 {
+    margin-bottom: 1rem;
+
+    font-size: 2rem;
+}
+
+.about-block div p {
+    color: #aaaaaa;
+
+    line-height: 1.8;
+}
+
+
+/* CTA */
+
+.about-cta {
+    min-height: 350px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 2rem;
+
+    text-align: center;
+}
+
+.about-cta p {
+    font-size: clamp(
+        2rem,
+        5vw,
+        4rem
+    );
+
+    font-weight: 600;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+
+    .about {
+        padding-left: 4%;
+        padding-right: 4%;
+    }
+
+    .about-hero {
+        min-height: 60vh;
+    }
+
+    .about-block {
+        grid-template-columns: 1fr;
+
+        gap: 1rem;
+
+        padding: 3rem 0;
+    }
+
+}

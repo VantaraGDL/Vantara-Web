@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Catálogo | Vant'ara</title>
+
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/catalogo.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            VANT'ARA
+        </a>
+
+        <nav class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="catalogo.html">Catálogo</a>
+            <a href="nosotros.html">Nosotros</a>
+            <a href="contacto.html">Contacto</a>
+        </nav>
+    </header>
+
+
+    <main class="catalog">
+
+        <section class="catalog-header">
+
+            <p class="catalog-label">
+                VANT'ARA
+            </p>
+
+            <h1>Catálogo</h1>
+
+            <p class="catalog-description">
+                Explora las piezas disponibles.
+            </p>
+
+        </section>
+
+
+        <section class="catalog-controls">
+
+            <div class="category-filters">
+
+                <button
+                    class="filter-button active"
+                    data-category="all"
+                >
+                    Todo
+                </button>
+
+                <button
+                    class="filter-button"
+                    data-category="T-Shirts"
+                >
+                    Playeras
+                </button>
+
+                <button
+                    class="filter-button"
+                    data-category="Hoodies"
+                >
+                    Hoodies
+                </button>
+
+                <button
+                    class="filter-button"
+                    data-category="Pants"
+                >
+                    Pants
+                </button>
+
+                <button
+                    class="filter-button"
+                    data-category="Shorts"
+                >
+                    Shorts
+                </button>
+
+                <button
+                    class="filter-button"
+                    data-category="Accessories"
+                >
+                    Accesorios
+                </button>
+
+            </div>
+
+
+            <div class="catalog-tools">
+
+                <input
+                    type="search"
+                    id="search-input"
+                    class="search-input"
+                    placeholder="Buscar producto..."
+                    aria-label="Buscar producto"
+                    autocomplete="off"
+                >
+
+
+                <select
+                    id="brand-filter"
+                    aria-label="Filtrar por marca"
+                >
+
+                    <option value="all">
+                        Todas las marcas
+                    </option>
+
+                    <option value="Essentials">
+                        Essentials
+                    </option>
+
+                    <option value="Hellstar">
+                        Hellstar
+                    </option>
+
+                    <option value="Van Cleef">
+                        Van Cleef
+                    </option>
+
+                </select>
+
+
+                <select
+                    id="sort-filter"
+                    aria-label="Ordenar productos"
+                >
+
+                    <option value="default">
+                        Orden recomendado
+                    </option>
+
+                    <option value="newest">
+                        Más recientes
+                    </option>
+
+                    <option value="az">
+                        Nombre A-Z
+                    </option>
+
+                    <option value="price-asc">
+                        Precio: menor a mayor
+                    </option>
+
+                    <option value="price-desc">
+                        Precio: mayor a menor
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+        <section>
+
+            <p
+                id="catalog-count"
+                class="catalog-count"
+            >
+            </p>
+            
+            <div
+                id="catalog-products"
+                class="product-grid"
+            >
+            </div>
+
+            <p
+                id="no-products"
+                class="no-products"
+                hidden
+            >
+                No hay productos disponibles con estos filtros.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <footer class="footer">
+
+        <div class="footer-main">
+
+            <div class="footer-brand">
+
+                <a
+                    href="index.html"
+                    class="footer-logo"
+                >
+                    VANT'ARA
+                </a>
+
+                <p>
+                    Streetwear, ropa y accesorios seleccionados.
+                </p>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <p class="footer-title">
+                    EXPLORA
+                </p>
+
+                <a href="index.html">
+                    Inicio
+                </a>
+
+                <a href="catalogo.html">
+                    Catálogo
+                </a>
+
+                <a href="nosotros.html">
+                    Nosotros
+                </a>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <p class="footer-title">
+                    CONTACTO
+                </p>
+
+                <a href="contacto.html">
+                    Contacto
+                </a>
+
+                <a
+                    href="https://www.instagram.com/vant.ara_gdl/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Instagram
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <p>
+                © 2026 Vant'ara
+            </p>
+
+            <p>
+                Guadalajara, México
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script src="js/productos.js"></script>
+    <script src="js/catalogo.js"></script>
+
+</body>
+</html>
