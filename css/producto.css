@@ -362,10 +362,105 @@
     .product-page {
         padding-left: 4%;
         padding-right: 4%;
+        padding-top: 1.5rem;
     }
 
     .product-data h1 {
         font-size: 2.5rem;
+        padding-top: 0;
     }
 
+    .product-detail {
+        gap: 1.8rem;
+    }
+
+    .product-description {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+    }
+
+    .product-gallery {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-main-image {
+        width: 100%;
+        max-width: none;
+        max-height: 65vh;
+
+        justify-self: auto;
+        object-fit: contain;
+    }
+
+    .product-option {
+        padding-bottom: 1rem;
+    }
+
+    .product-options {
+        gap: 1.2rem;
+        margin-bottom: 1.8rem;
+    }
+
+    .product-thumbnails {
+        order: 2;
+
+        width: 100%;
+
+        display: flex;
+        flex-direction: row;
+
+        gap: 0.7rem;
+
+        overflow-x: auto;
+    }
+
+    .thumbnail-button {
+        flex: 0 0 70px;
+
+        width: 70px;
+    }
+
+    .related-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+    }
+
+    .related-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .related-section .product-grid {
+        display: flex;
+
+        gap: 1rem;
+
+        overflow-x: auto;
+
+        scroll-snap-type: x mandatory;
+
+        padding-bottom: 1rem;
+    }
+
+    .related-section .product-card {
+        flex: 0 0 70%;
+
+        scroll-snap-align: start;
+    }
+
+    .back-link {
+        margin-bottom: 1.5rem;
+    }
 }
+/* Acordeón nativo: funciona con teclado y sin eventos adicionales. */
+.product-description summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; cursor: pointer; min-height: 48px; list-style: none; }
+.product-description summary::-webkit-details-marker { display: none; }
+.product-description summary h2 { margin: 0; }
+.product-description[open] summary { margin-bottom: 1rem; }
+.accordion-icon::before { content: "+"; font-size: 1.5rem; }
+.product-description[open] .accordion-icon::before { content: "−"; }
+.product-main-image { max-width: 100%; }
+.product-data, .product-gallery { min-width: 0; }
+.product-data h1 { overflow-wrap: anywhere; }
+@media (max-width: 650px) { .product-data { padding-top: 0; } }
+

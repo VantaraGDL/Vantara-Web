@@ -204,3 +204,5 @@
     }
 
 }
+.search-input:focus-visible, .catalog-tools select:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.catalog-tools { width: 100%; }

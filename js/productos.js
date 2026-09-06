@@ -1,279 +1,377 @@
 const products = [
-
-    // ESSENTIALS - HOODIES
-
     {
-        id: 1,
-        brand: "Essentials",
-        category: "Hoodies",
-        model: "Stretch Lim",
-        color: "Black",
-        price: null,
-        featured: true,
-        image: ""
+        "id": 1,
+        "brand": "Essentials",
+        "category": "Hoodies",
+        "model": "Strech Lim",
+        "color": "Black",
+        "price": 999,
+        "featured": true,
+        "name": "Essentials Hoodie Strech Lim",
+        "images": [
+            "assets/img/catalogo/essentials-hoodie-strech-lim.png"
+        ]
     },
-
     {
-    id: 2,
-
-    name: "Essentials Hoodie",
-
-    brand: "Essentials",
-    category: "Hoodies",
-
-    model: "Modelo pendiente",
-    color: "Light Oatmeal",
-
-    price: null,
-
-    material: "Pendiente",
-
-    description: "...",
-
-    sizes: ["S", "M", "L", "XL"],
-
-    stock: {
-        S: 1,
-        M: 2,
-        L: 0,
-        XL: 1
+        "id": 2,
+        "name": "Essentials Hoodie Light Oatmeal",
+        "brand": "Essentials",
+        "category": "Hoodies",
+        "model": "Light Oatmeal",
+        "color": "Light Oatmeal",
+        "price": 999,
+        "material": "Pendiente",
+        "description": "...",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL"
+        ],
+        "stock": {
+            "S": 1,
+            "M": 2,
+            "L": 0,
+            "XL": 1
+        },
+        "featured": true,
+        "images": [
+            "assets/img/catalogo/essentials-hoodie-light-oatmeal.png"
+        ]
     },
-
-    featured: true,
-
-    images: [
-        "assets/img/essentials-light-oatmeal/01.png",
-        "assets/img/essentials-light-oatmeal/02.png",
-        "assets/img/essentials-light-oatmeal/03.png"
-    ]
-    },
-
     {
-        id: 3,
-        brand: "Essentials",
-        category: "Hoodies",
-        model: "Dark Oatmeal",
-        color: "Dark Oatmeal",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 3,
+        "brand": "Essentials",
+        "category": "Hoodies",
+        "model": "Dark Oatmeal",
+        "color": "Dark Oatmeal",
+        "price": 999,
+        "featured": false,
+        "name": "Essentials Hoodie Dark Oatmeal",
+        "images": [
+            "assets/img/catalogo/essentials-hoodie-dark-oatmeal.png"
+        ]
     },
-
     {
-        id: 4,
-        brand: "Essentials",
-        category: "Hoodies",
-        model: "Fleece Black",
-        color: "Black",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 4,
+        "brand": "Essentials",
+        "category": "Hoodies",
+        "model": "Fleece Black",
+        "color": "Black",
+        "price": 1199,
+        "featured": false,
+        "name": "Essentials Hoodie Fleece Black",
+        "images": [
+            "assets/img/catalogo/essentials-hoodie-fleece-black.png"
+        ]
     },
-
     {
-        id: 5,
-        brand: "Essentials",
-        category: "Hoodies",
-        model: "Desert Sand",
-        color: "Desert Sand",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 5,
+        "brand": "Essentials",
+        "category": "Hoodies",
+        "model": "Desert Sand",
+        "color": "Desert Sand",
+        "price": 1199,
+        "featured": false,
+        "name": "Essentials Hoodie Desert Sand",
+        "images": [
+            "assets/img/catalogo/essentials-hoodie-desert-sand.png"
+        ]
     },
-
     {
-        id: 6,
-        brand: "Essentials",
-        category: "Hoodies",
-        model: "Dusty Beige",
-        color: "Dusty Beige",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 6,
+        "brand": "Essentials",
+        "category": "Hoodies",
+        "model": "Dusty Beige",
+        "color": "Dusty Beige",
+        "price": 1199,
+        "featured": false,
+        "name": "Essentials Hoodie Dusty Beige",
+        "images": [
+            "assets/img/catalogo/essentials-hoodie-dusty-beige.png"
+        ]
     },
-
-
-    // ESSENTIALS - T-SHIRTS
-
     {
-        id: 7,
-        brand: "Essentials",
-        category: "T-Shirts",
-        model: "Stretch Lim",
-        color: "Black",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 8,
+        "brand": "Essentials",
+        "category": "T-Shirts",
+        "model": "Light Oatmeal",
+        "color": "Light Oatmeal",
+        "price": 899,
+        "featured": false,
+        "name": "Essentials T-shirt Light Oatmeal",
+        "images": [
+            "assets/img/catalogo/essentials-t-shirt-light-oatmeal.png"
+        ]
     },
-
     {
-        id: 8,
-        brand: "Essentials",
-        category: "T-Shirts",
-        model: "Light Oatmeal",
-        color: "Light Oatmeal",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 9,
+        "brand": "Essentials",
+        "category": "T-Shirts",
+        "model": "Bright White",
+        "color": "White",
+        "price": 899,
+        "featured": true,
+        "name": "Essentials T-shirt Bright White",
+        "images": [
+            "assets/img/catalogo/essentials-t-shirt-bright-white.jpg"
+        ]
     },
-
     {
-        id: 9,
-        brand: "Essentials",
-        category: "T-Shirts",
-        model: "Bright White",
-        color: "White",
-        price: null,
-        featured: true,
-        image: ""
+        "id": 10,
+        "brand": "Essentials",
+        "category": "T-Shirts",
+        "model": "Fleece Black",
+        "color": "Black",
+        "price": 899,
+        "featured": false,
+        "name": "Essentials T-shirt Fleece Black",
+        "images": [
+            "assets/img/catalogo/essentials-t-shirt-fleece-black.jpg"
+        ]
     },
-
     {
-        id: 10,
-        brand: "Essentials",
-        category: "T-Shirts",
-        model: "Fleece Black",
-        color: "Black",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 11,
+        "brand": "Essentials",
+        "category": "T-Shirts",
+        "model": "Dusty Beige",
+        "color": "Dusty Beige",
+        "price": 999,
+        "featured": false,
+        "name": "Essentials T-shirt Dusty Beige",
+        "images": [
+            "assets/img/catalogo/essentials-t-shirt-dusty-beige.png"
+        ]
     },
-
     {
-        id: 11,
-        brand: "Essentials",
-        category: "T-Shirts",
-        model: "Dusty Beige",
-        color: "Dusty Beige",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 12,
+        "brand": "Essentials",
+        "category": "Pants",
+        "model": "Dark Oatmeal",
+        "color": "Dark Oatmeal",
+        "price": 999,
+        "featured": false,
+        "name": "Essentials Pants Dark Oatmeal",
+        "images": [
+            "assets/img/catalogo/essentials-pants-dark-oatmeal.jpg"
+        ]
     },
-
-
-    // ESSENTIALS - PANTS
-
     {
-        id: 12,
-        brand: "Essentials",
-        category: "Pants",
-        model: "Dark Oatmeal",
-        color: "Dark Oatmeal",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 14,
+        "brand": "Essentials",
+        "category": "Pants",
+        "model": "Dusty Beige",
+        "color": "Dusty Beige",
+        "price": 1199,
+        "featured": false,
+        "name": "Essentials Pants Dusty Beige",
+        "images": [
+            "assets/img/catalogo/essentials-pants-dusty-beige.jpg"
+        ]
     },
-
     {
-        id: 13,
-        brand: "Essentials",
-        category: "Pants",
-        model: "Desert Taupe",
-        color: "Desert Taupe",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 15,
+        "brand": "Essentials",
+        "category": "Pants",
+        "model": "Fleece Black",
+        "color": "Black",
+        "price": 1199,
+        "featured": false,
+        "name": "Essentials Pants Fleece Black",
+        "images": [
+            "assets/img/catalogo/essentials-pants-fleece-black.jpg"
+        ]
     },
-
     {
-        id: 14,
-        brand: "Essentials",
-        category: "Pants",
-        model: "Dusty Beige",
-        color: "Dusty Beige",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 16,
+        "brand": "Essentials",
+        "category": "Shorts",
+        "model": "Desert Taupe",
+        "color": "Desert Taupe",
+        "price": 899,
+        "featured": false,
+        "name": "Essentials Short Desert Taupe",
+        "images": [
+            "assets/img/catalogo/essentials-short-desert-taupe.jpg"
+        ]
     },
-
     {
-        id: 15,
-        brand: "Essentials",
-        category: "Pants",
-        model: "Fleece Black",
-        color: "Black",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 17,
+        "brand": "Hellstar",
+        "category": "T-Shirts",
+        "model": "Paradise Graphic",
+        "color": "Black",
+        "price": null,
+        "featured": true,
+        "name": "Hellstar T-shirt Paradise Graphic",
+        "images": []
     },
-
-
-    // ESSENTIALS - SHORTS
-
     {
-        id: 16,
-        brand: "Essentials",
-        category: "Shorts",
-        model: "Desert Taupe",
-        color: "Desert Taupe",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 18,
+        "brand": "Hellstar",
+        "category": "T-Shirts",
+        "model": "Graphic 02",
+        "color": "White",
+        "price": null,
+        "featured": false,
+        "name": "Hellstar T-shirt Graphic 02",
+        "images": []
     },
-
-
-    // HELLSTAR
-
     {
-        id: 17,
-        brand: "Hellstar",
-        category: "T-Shirts",
-        model: "Paradise Graphic",
-        color: "Black",
-        price: null,
-        featured: true,
-        image: ""
+        "id": 19,
+        "brand": "Hellstar",
+        "category": "T-Shirts",
+        "model": "Graphic 03",
+        "color": "Black",
+        "price": null,
+        "featured": false,
+        "name": "Hellstar T-shirt Graphic 03",
+        "images": []
     },
-
     {
-        id: 18,
-        brand: "Hellstar",
-        category: "T-Shirts",
-        model: "Graphic 02",
-        color: "White",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 20,
+        "brand": "Hellstar",
+        "category": "T-Shirts",
+        "model": "Logo Graphic",
+        "color": "Black",
+        "price": null,
+        "featured": false,
+        "name": "Hellstar T-shirt Logo Graphic",
+        "images": []
     },
-
     {
-        id: 19,
-        brand: "Hellstar",
-        category: "T-Shirts",
-        model: "Graphic 03",
-        color: "Black",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 21,
+        "brand": "Van Cleef",
+        "category": "Accessories",
+        "model": "Pulsera Clover",
+        "color": "Black",
+        "material": "Plata 925",
+        "finish": "Plateado",
+        "price": null,
+        "featured": false,
+        "name": "Van Cleef Pulsera Clover",
+        "images": []
     },
-
     {
-        id: 20,
-        brand: "Hellstar",
-        category: "T-Shirts",
-        model: "Logo Graphic",
-        color: "Black",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 22,
+        "featured": false,
+        "name": "Essentials Short Fleece Black",
+        "brand": "Essentials",
+        "category": "Shorts",
+        "model": "Fleece Black",
+        "price": 899,
+        "images": [
+            "assets/img/catalogo/essentials-short-fleece-black.png"
+        ]
     },
-
-
-    // ACCESORIOS
-
     {
-        id: 21,
-        brand: "Van Cleef",
-        category: "Accessories",
-        model: "Pulsera Clover",
-        color: "Black",
-        material: "Plata 925",
-        finish: "Plateado",
-        price: null,
-        featured: false,
-        image: ""
+        "id": 23,
+        "featured": false,
+        "name": "Essentials Short Dusty Beige",
+        "brand": "Essentials",
+        "category": "Shorts",
+        "model": "Dusty Beige",
+        "price": 899,
+        "images": [
+            "assets/img/catalogo/essentials-short-dusty-beige.jpg"
+        ]
+    },
+    {
+        "id": 24,
+        "featured": false,
+        "name": "Essentials Short Strech Lim",
+        "brand": "Essentials",
+        "category": "Shorts",
+        "model": "Strech Lim",
+        "price": 899,
+        "images": [
+            "assets/img/catalogo/essentials-short-strech-lim.jpg"
+        ]
+    },
+    {
+        "id": 25,
+        "featured": false,
+        "name": "Essentials Pants Light Health",
+        "brand": "Essentials",
+        "category": "Pants",
+        "model": "Light Health",
+        "price": 1199,
+        "images": [
+            "assets/img/catalogo/essentials-pants-light-health.png"
+        ]
+    },
+    {
+        "id": 26,
+        "featured": false,
+        "name": "Alo Suéter Negro",
+        "brand": "Alo",
+        "category": "Sueter",
+        "model": "Negro",
+        "price": 1399,
+        "images": [
+            "assets/img/catalogo/alo-sueter-negro.png"
+        ]
+    },
+    {
+        "id": 27,
+        "featured": false,
+        "name": "Alo Suéter Gris",
+        "brand": "Alo",
+        "category": "Sueter",
+        "model": "Gris",
+        "price": 1399,
+        "images": [
+            "assets/img/catalogo/alo-sueter-gris.png"
+        ]
+    },
+    {
+        "id": 28,
+        "featured": false,
+        "name": "Alo Suéter Azul",
+        "brand": "Alo",
+        "category": "Sueter",
+        "model": "Azul",
+        "price": 1399,
+        "images": [
+            "assets/img/catalogo/alo-sueter-azul.png"
+        ]
+    },
+    {
+        "id": 29,
+        "featured": false,
+        "name": "Alo Hoodie Azul",
+        "brand": "Alo",
+        "category": "Hoodies",
+        "model": "Azul",
+        "price": 1399,
+        "images": [
+            "assets/img/catalogo/alo-hoodie-azul.png"
+        ]
+    },
+    {
+        "id": 30,
+        "featured": false,
+        "name": "Alo Hoodie Café",
+        "brand": "Alo",
+        "category": "Hoodies",
+        "model": "Café",
+        "price": 1399,
+        "images": [
+            "assets/img/catalogo/alo-hoodie-cafe.png"
+        ]
+    },
+    {
+        "id": 31,
+        "featured": false,
+        "name": "Alo Hoodie Negro",
+        "brand": "Alo",
+        "category": "Hoodies",
+        "model": "Negro",
+        "price": 1399,
+        "images": [
+            "assets/img/catalogo/alo-hoodie-negro.png"
+        ]
     }
-
 ];
 
 const featuredContainer =
@@ -363,36 +461,17 @@ function createProductCard(product) {
 
     const primaryImage =
         images[0] ||
-        "https://placehold.co/600x800?text=Vant%27ara";
+        "assets/img/producto-pendiente.svg";
 
     const secondaryImage =
         images.length > 1
             ? images[1]
             : null;
 
-    const stockLabel =
-        getStockLabel(product);
-
-    const totalStock =
-        getTotalStock(product);
-
     article.innerHTML = `
         <a href="producto.html?id=${product.id}">
 
             <div class="product-image">
-
-                ${
-                    stockLabel
-                        ? `
-                            <span class="
-                                stock-badge
-                                ${totalStock === 0 ? "sold-out" : ""}
-                            ">
-                                ${stockLabel}
-                            </span>
-                        `
-                    : ""
-                }
 
                 <img
                     class="
@@ -400,7 +479,7 @@ function createProductCard(product) {
                         ${secondaryImage ? "has-secondary" : ""}
                     "
                     src="${primaryImage}"
-                    alt="${product.brand} ${product.model}"
+                    alt="${product.name || product.model}"
                 >
 
                 ${
@@ -409,7 +488,7 @@ function createProductCard(product) {
                             <img
                                 class="product-image-secondary"
                                 src="${secondaryImage}"
-                                alt="${product.brand} ${product.model} - segunda vista"
+                                alt="${product.name || product.model} - segunda vista"
                             >
                         `
                         : ""
@@ -424,7 +503,7 @@ function createProductCard(product) {
                 </p>
 
                 <h3>
-                    ${product.model}
+                    ${product.name || product.model}
                 </h3>
 
                 <p class="product-price">

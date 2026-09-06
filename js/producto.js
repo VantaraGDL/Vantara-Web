@@ -27,6 +27,11 @@ const product =
 
 if (!product) {
 
+    document.title = "Producto no encontrado | Vant'ara";
+    const robots = document.createElement("meta");
+    robots.name = "robots";
+    robots.content = "noindex";
+    document.head.appendChild(robots);
     productDetail.hidden = true;
     productError.hidden = false;
     relatedSection.hidden = true;
@@ -46,7 +51,7 @@ function renderProduct(product) {
         product.images && product.images.length > 0
             ? product.images
             : [
-            "https://placehold.co/900x1200?text=Vant%27ara"
+            "assets/img/producto-pendiente.svg"
             ];
 
 
@@ -56,7 +61,7 @@ function renderProduct(product) {
 
 
     const sizesHTML =
-        createSizes(product);
+        createSizes();
 
 
     productDetail.innerHTML = `
@@ -69,7 +74,7 @@ function renderProduct(product) {
                 <img
                 id="main-product-image"
                 src="${images[0]}"
-                alt="${product.brand} ${product.model}"
+                alt="${product.name || product.model}"
                 >
 
             </div>
@@ -80,6 +85,8 @@ function renderProduct(product) {
                     <button
                         class="thumbnail-button ${index === 0 ? "active" : ""}"
                         data-image="${image}"
+                        aria-label="Ver imagen ${index + 1}"
+                        aria-pressed="${index === 0}"
                     >
                         <img
                             src="${image}"
@@ -105,86 +112,26 @@ function renderProduct(product) {
             </h1>
 
 
-            ${
-                product.name
-                    ? `
-                        <p class="product-option-value">
-                            ${product.model}
-                        </p>
-                    `
-                    : ""
-            }
-
-
             <p class="product-price-detail">
                 ${price}
             </p>
 
 
             <div class="product-options">
+                <div class="product-option">
+                    <p class="product-option-label">Material</p>
+                    <p class="product-option-value">
+                        ${product.material?.trim() || "Pendiente"}
+                    </p>
+                </div>
 
-                ${
-                    product.color
-                        ? `
-                            <div class="product-option">
-
-                                <p class="product-option-label">
-                                    Color
-                                </p>
-
-                                <p class="product-option-value">
-                                    ${product.color}
-                                </p>
-
-                            </div>
-                        `
-                        : ""
-                }
-
-
-                ${
-                    product.material
-                        ? `
-                            <div class="product-option">
-
-                                <p class="product-option-label">
-                                    Material
-                                </p>
-
-                                <p class="product-option-value">
-                                    ${product.material}
-                                </p>
-
-                            </div>
-                        `
-                        : ""
-                }
-
-
-                ${
-                    sizesHTML
-                        ? `
-                            <div class="product-option">
-
-                                <p class="product-option-label">
-                                    Talla
-                                </p>
-
-                                <div class="size-list">
-                                    ${sizesHTML}
-                                </div>
-
-                                <p
-                                    id="stock-status"
-                                    class="stock-status"
-                                >
-                                    Selecciona una talla
-                                </p>
-                            </div>
-                        `
-                        : ""
-                }
-
+                <div class="product-option">
+                    <p class="product-option-label">Talla</p>
+                    <div class="size-list">${sizesHTML}</div>
+                    <p id="stock-status" class="stock-status" role="status">
+                        Selecciona una talla
+                    </p>
+                </div>
             </div>
 
 
@@ -196,74 +143,40 @@ function renderProduct(product) {
             </button>
 
 
-            ${
-                product.description
-                    ? `
-                        <div class="product-description">
-
-                            <h2>
-                                Descripción
-                            </h2>
-
-                            <p>
-                                ${product.description}
-                            </p>
-
-                        </div>
-                    `
-                    : ""
-            }
+            <details class="product-description">
+                <summary><h2>Descripción</h2><span class="accordion-icon" aria-hidden="true"></span></summary>
+                <p>
+                    ${product.description?.trim() && !/^[.\s…]+$/.test(product.description)
+                        ? product.description
+                        : "Descripción pendiente."}
+                </p>
+            </details>
 
         </div>
     `;
 
 
-    setupSizeButtons(product);
+    document.title = `${product.name || product.model} | Vant'ara`;
+    document.querySelector('meta[name="description"]').content = `${product.name || product.model}. Consulta sus detalles, tallas y disponibilidad en Vant'ara.`;
+
+    setupSizeButtons();
 
     setupContactButton(product);
-
     setupGallery();
 }
 
-function createSizes(product) {
-
-    if (!product.sizes) {
-        return "";
-    }
-
-
-    return product.sizes
-        .map(size => {
-
-            const stock =
-                product.stock?.[size] ?? 0;
-
-
-            const disabled =
-                stock <= 0
-                    ? "disabled"
-                    : "";
-
-
-            return `
-                <button
-                    class="size-button"
-                    data-size="${size}"
-                    ${disabled}
-                >
-                    ${size}
-                </button>
-            `;
-
-        })
-        .join("");
-
+function createSizes() {
+    return ["S", "M", "L", "XL"].map(size => `
+        <button class="size-button" aria-pressed="false" data-size="${size}">
+            ${size}
+        </button>
+    `).join("");
 }
 
 let selectedSize = null;
 
 
-function setupSizeButtons(product) {
+function setupSizeButtons() {
 
     const buttons =
         document.querySelectorAll(".size-button");
@@ -278,40 +191,20 @@ function setupSizeButtons(product) {
 
             buttons.forEach(button => {
                 button.classList.remove("selected");
+                button.setAttribute("aria-pressed", "false");
             });
 
 
             button.classList.add("selected");
+            button.setAttribute("aria-pressed", "true");
 
 
             selectedSize =
                 button.dataset.size;
 
 
-            const stock =
-                product.stock?.[selectedSize] ?? 0;
-
-
-            if (!stockStatus) {
-                return;
-            }
-
-
-            if (stock === 1) {
-
-                stockStatus.textContent =
-                    `${selectedSize} — Última pieza`;
-
-            } else if (stock === 2) {
-
-                stockStatus.textContent =
-                    `${selectedSize} — Últimas 2 piezas`;
-
-            } else {
-
-                stockStatus.textContent =
-                    `${selectedSize} — Disponible`;
-
+            if (stockStatus) {
+                stockStatus.textContent = `Talla seleccionada: ${selectedSize}`;
             }
 
         });
@@ -329,7 +222,6 @@ function setupContactButton(product) {
     button.addEventListener("click", () => {
 
         if (
-            product.sizes &&
             !selectedSize
         ) {
 
@@ -342,7 +234,7 @@ function setupContactButton(product) {
 
 
         let message =
-            `Hola, me interesa ${product.brand} ${product.model}.`;
+            `Hola, me interesa ${product.name || product.model}.`;
 
 
         if (selectedSize) {
@@ -380,10 +272,12 @@ function setupGallery() {
 
             thumbnails.forEach(thumbnail => {
                 thumbnail.classList.remove("active");
+                thumbnail.setAttribute("aria-pressed", "false");
             });
 
 
             button.classList.add("active");
+            button.setAttribute("aria-pressed", "true");
 
         });
 

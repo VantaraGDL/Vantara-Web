@@ -9,28 +9,103 @@
     >
 
     <title>Catálogo | Vant'ara</title>
+    <meta name="description" content="Explora ropa y accesorios de Vant'ara. Busca por producto, filtra por categoría y marca, y consulta la disponibilidad.">
 
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/catalogo.css">
 </head>
 
 <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <header class="navbar">
+
+    <a href="index.html" class="logo">
+        VANT'ARA
+    </a>
+
+
+    <nav class="nav-links" aria-label="Principal">
+        <a href="index.html">Inicio</a>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="contacto.html">Contacto</a>
+    </nav>
+
+
+    <button
+        class="menu-toggle"
+        id="menu-toggle"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+    >
+        <span></span>
+        <span></span>
+    </button>
+
+</header>
+
+
+<div
+    class="mobile-menu"
+    id="mobile-menu"
+    aria-hidden="true"
+>
+
+    <div class="mobile-menu-header">
+
         <a href="index.html" class="logo">
             VANT'ARA
         </a>
 
-        <nav class="nav-links">
-            <a href="index.html">Inicio</a>
-            <a href="catalogo.html">Catálogo</a>
-            <a href="nosotros.html">Nosotros</a>
-            <a href="contacto.html">Contacto</a>
-        </nav>
-    </header>
+        <button
+            class="mobile-menu-close"
+            id="mobile-menu-close"
+            aria-label="Cerrar menú"
+        >
+            ×
+        </button>
+
+    </div>
 
 
-    <main class="catalog">
+    <nav class="mobile-menu-links" aria-label="Principal móvil">
+
+        <a href="index.html">
+            Inicio
+        </a>
+
+        <a href="catalogo.html">
+            Catálogo
+        </a>
+
+        <a href="nosotros.html">
+            Nosotros
+        </a>
+
+        <a href="contacto.html">
+            Contacto
+        </a>
+
+    </nav>
+
+
+    <div class="mobile-menu-footer">
+
+        <a
+            href="https://www.instagram.com/vant.ara_gdl/"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            Instagram
+        </a>
+
+    </div>
+
+</div>
+
+    <main id="contenido" tabindex="-1" class="catalog">
 
         <section class="catalog-header">
 
@@ -52,42 +127,49 @@
             <div class="category-filters">
 
                 <button
-                    class="filter-button active"
+                    class="filter-button active" aria-pressed="true"
                     data-category="all"
                 >
                     Todo
                 </button>
 
                 <button
-                    class="filter-button"
+                    class="filter-button" aria-pressed="false"
                     data-category="T-Shirts"
                 >
                     Playeras
                 </button>
 
                 <button
-                    class="filter-button"
+                    class="filter-button" aria-pressed="false"
                     data-category="Hoodies"
                 >
                     Hoodies
                 </button>
 
                 <button
-                    class="filter-button"
+                    class="filter-button" aria-pressed="false"
+                    data-category="Sueter"
+                >
+                    Sueter
+                </button>
+
+                <button
+                    class="filter-button" aria-pressed="false"
                     data-category="Pants"
                 >
                     Pants
                 </button>
 
                 <button
-                    class="filter-button"
+                    class="filter-button" aria-pressed="false"
                     data-category="Shorts"
                 >
                     Shorts
                 </button>
 
                 <button
-                    class="filter-button"
+                    class="filter-button" aria-pressed="false"
                     data-category="Accessories"
                 >
                     Accesorios
@@ -116,6 +198,8 @@
                     <option value="all">
                         Todas las marcas
                     </option>
+
+                    <option value="Alo">Alo</option>
 
                     <option value="Essentials">
                         Essentials
@@ -167,7 +251,7 @@
         <section>
 
             <p
-                id="catalog-count"
+                id="catalog-count" role="status"
                 class="catalog-count"
             >
             </p>
@@ -228,6 +312,7 @@
                 <a href="nosotros.html">
                     Nosotros
                 </a>
+                
 
             </div>
 
@@ -272,6 +357,7 @@
 
     <script src="js/productos.js"></script>
     <script src="js/catalogo.js"></script>
-
+    <script src="js/menu.js"></script>
+    
 </body>
 </html>

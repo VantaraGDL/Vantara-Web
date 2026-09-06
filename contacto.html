@@ -9,30 +9,103 @@
     >
 
     <title>Contacto | Vant'ara</title>
+    <meta name="description" content="Contacta a Vant'ara para consultar productos, tallas y disponibilidad en Guadalajara, México.">
 
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/contacto.css">
 </head>
 
 <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <header class="navbar">
+
+    <a href="index.html" class="logo">
+        VANT'ARA
+    </a>
+
+
+    <nav class="nav-links" aria-label="Principal">
+        <a href="index.html">Inicio</a>
+        <a href="catalogo.html">Catálogo</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="contacto.html">Contacto</a>
+    </nav>
+
+
+    <button
+        class="menu-toggle"
+        id="menu-toggle"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+    >
+        <span></span>
+        <span></span>
+    </button>
+
+</header>
+
+
+<div
+    class="mobile-menu"
+    id="mobile-menu"
+    aria-hidden="true"
+>
+
+    <div class="mobile-menu-header">
 
         <a href="index.html" class="logo">
             VANT'ARA
         </a>
 
-        <nav class="nav-links">
-            <a href="index.html">Inicio</a>
-            <a href="catalogo.html">Catálogo</a>
-            <a href="nosotros.html">Nosotros</a>
-            <a href="contacto.html">Contacto</a>
-        </nav>
+        <button
+            class="mobile-menu-close"
+            id="mobile-menu-close"
+            aria-label="Cerrar menú"
+        >
+            ×
+        </button>
 
-    </header>
+    </div>
 
 
-    <main class="contact">
+    <nav class="mobile-menu-links" aria-label="Principal móvil">
+
+        <a href="index.html">
+            Inicio
+        </a>
+
+        <a href="catalogo.html">
+            Catálogo
+        </a>
+
+        <a href="nosotros.html">
+            Nosotros
+        </a>
+
+        <a href="contacto.html">
+            Contacto
+        </a>
+
+    </nav>
+
+
+    <div class="mobile-menu-footer">
+
+        <a
+            href="https://www.instagram.com/vant.ara_gdl/"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            Instagram
+        </a>
+
+    </div>
+
+</div>
+
+    <main id="contenido" tabindex="-1" class="contact">
 
         <section class="contact-header">
 
@@ -165,6 +238,7 @@
                 <a href="nosotros.html">
                     Nosotros
                 </a>
+                
 
             </div>
 
@@ -205,6 +279,8 @@
         </div>
 
     </footer>
+
+    <script src="js/menu.js"></script>
 
 </body>
 </html>
