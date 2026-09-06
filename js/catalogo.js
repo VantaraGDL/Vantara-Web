@@ -309,6 +309,10 @@ function comparePrice(
 
 categoryFilter.addEventListener("change", () => {
     selectedCategory = categoryFilter.value;
+    selectedBrand = "all";
+    selectedSort = "default";
+    sortFilter.value = "default";
+    stockOnly.checked = false;
     updateBrandOptions();
     renderCatalog();
 });

@@ -271,7 +271,12 @@ function setupSizeButtons() {
         group.querySelectorAll('.size-button').forEach(button => {
             button.addEventListener('click', () => {
                 if (!orderSelection.has(id) || sizeUnavailable(item, button.dataset.size)) return;
-                orderSelection.get(id).size = button.dataset.size;
+                const selection = orderSelection.get(id);
+                if (selection.size !== button.dataset.size) {
+                    selection.quantity = 1;
+                    document.querySelector(`[data-quantity-for="${id}"]`).value = 1;
+                }
+                selection.size = button.dataset.size;
                 document.querySelectorAll(`[data-sizes-for="${id}"] .size-button`).forEach(option => {
                     const active = option.dataset.size === button.dataset.size;
                     option.classList.toggle('selected', active);
