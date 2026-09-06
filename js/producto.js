@@ -432,6 +432,7 @@ function getRelationScore(
 
     return score;
 }
+ 
 
 function renderQuantity(item) {
     return `<div class="quantity-control" role="group" aria-label="Cantidad de ${item.name || item.model}">
