@@ -23,7 +23,10 @@ const catalogCount =
     document.querySelector("#catalog-count"); 
 
 
-let selectedCategory = "all";
+const requestedCategory = new URLSearchParams(window.location.search).get("category");
+let selectedCategory = Array.from(categoryFilter.options).some(option => option.value === requestedCategory)
+    ? requestedCategory : "all";
+categoryFilter.value = selectedCategory;
 let selectedBrand = "all";
 let searchTerm = "";
 let selectedSort = "default";
@@ -225,7 +228,7 @@ function sortProducts(productList) {
 
         default:
 
-            const brandOrder = ["Essentials", "Hellstar", "Van Cleef", "Alo"];
+            const brandOrder = ["Essentials", "Van Cleef", "Alo"];
             const categoryOrder = [
                 "Hoodies", "T-Shirts", "Pants", "Shorts", "Sueter", "Accessories"
             ];

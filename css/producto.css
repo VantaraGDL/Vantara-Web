@@ -565,3 +565,9 @@
 .outfit-card:has(input:checked) .outfit-info > label, .outfit-card:has(input:checked) .outfit-info > p { grid-column: 2; }
 .outfit-card:has(input:checked) fieldset { grid-column: 1 / -1; }
 .order-panel #order-summary { white-space: pre-line; }
+.image-viewer { background: rgb(17 17 17 / .42); }
+.image-viewer::backdrop { background: rgb(0 0 0 / .4); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); }
+.viewer-arrow { position: absolute; top: 50%; z-index: 2; width: 44px; height: 52px; border: 1px solid #777; border-radius: 6px; background: rgb(20 20 20 / .85); color: #fff; font-size: 2.3rem; cursor: pointer; }
+.viewer-prev { left: 12px; }
+.viewer-next { right: 12px; }
+.viewer-counter { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); padding: .25rem .65rem; background: #111c; border-radius: 12px; color: #fff; font-size: .8rem; pointer-events: none; }

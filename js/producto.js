@@ -49,6 +49,7 @@ if (!product) {
 
 
 function renderProduct(product) {
+    document.querySelector(".back-link").href = "catalogo.html?category=" + encodeURIComponent(product.category);
 
     const images =
         product.images && product.images.length > 0
@@ -131,7 +132,7 @@ function renderProduct(product) {
                 <div class="product-option">
                     <p class="product-option-label">Talla</p>
                     <div class="size-quantity-row"><div class="size-list" data-sizes-for="${product.id}">${sizesHTML || "No requiere talla"}</div>${renderQuantity(product)}</div>
-                    <p id="stock-status" class="stock-status" role="status">
+                    <p id="stock-status" class="stock-status" role="status" ${sizesHTML ? "" : "hidden"}>
                         Selecciona una talla
                     </p>
                 </div>
@@ -231,11 +232,10 @@ function renderCollection(current) {
 function updateOrderSummary() {
     const selected = products.filter(p => orderSelection.has(p.id));
     const pieces = selected.reduce((sum, p) => sum + orderSelection.get(p.id).quantity, 0);
-    const valid = selected.every(p => Number.isSafeInteger(orderSelection.get(p.id).quantity) && orderSelection.get(p.id).quantity > 0);
+    const valid = selected.every(p => Number.isSafeInteger(orderSelection.get(p.id).quantity) && orderSelection.get(p.id).quantity > 0 && orderSelection.get(p.id).quantity <= quantityLimit(p, orderSelection.get(p.id).size));
     document.querySelectorAll("#outfit-summary, #order-summary").forEach(summary => {
-        const completePrice = selected.every(knownPrice);
-        const total = selected.reduce((sum, p) => sum + (knownPrice(p) ? Number(p.price) * orderSelection.get(p.id).quantity : 0), 0);
-        summary.textContent = !valid ? "Revisa las cantidades: usa números enteros mayores que cero." : `${pieces} ${pieces === 1 ? "pieza" : "piezas"} · ${selected.length} ${selected.length === 1 ? 'producto seleccionado' : 'productos seleccionados'}\n${completePrice ? 'Total: ' + money(total) : 'Subtotal conocido: ' + money(total) + ' · Total por confirmar'}`;
+        const { completePrice, subtotal, discount, total } = calculateOrder(selected);
+        summary.textContent = !valid ? "Revisa las cantidades: de 1 a 5 piezas por producto, según disponibilidad." : `${pieces} ${pieces === 1 ? "pieza" : "piezas"} · ${selected.length} ${selected.length === 1 ? 'producto seleccionado' : 'productos seleccionados'}\n${discount ? 'Descuento por conjunto: −' + money(discount) + '\n' : ''}${completePrice ? 'Total: ' + money(total) : 'Subtotal conocido: ' + money(subtotal) + ' · Total por confirmar'}`;
     });
     document.querySelector("#contact-button").disabled = selected.length === 0;
     document.querySelector("#order-error").textContent = "";
@@ -294,7 +294,7 @@ function setupContactButton() {
             const { size, quantity } = orderSelection.get(item.id);
             const limit = quantityLimit(item, size);
             if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > limit) {
-                error.textContent = `Revisa la cantidad de ${item.name || item.model}. ${quantity > limit ? "Supera las piezas disponibles para esta talla." : "Debe ser un número entero mayor que cero."}`;
+                error.textContent = `Revisa la cantidad de ${item.name || item.model}. ${quantity > 5 ? "El máximo es de 5 piezas por producto." : quantity > limit ? "Supera las piezas disponibles para esta talla." : "Debe ser un número entero mayor que cero."}`;
                 document.querySelector(`[data-quantity-for="${item.id}"]`)?.focus();
                 return;
             }
@@ -312,8 +312,9 @@ function setupContactButton() {
             const { size, quantity } = orderSelection.get(item.id);
             return `${item.name || item.model}${size ? ' — Talla ' + size : ''} — ${quantity} pieza(s) — ${knownPrice(item) ? money(item.price).replace(' MXN', '') : 'Precio por confirmar'}`;
         });
-        const total = selected.every(knownPrice) ? money(selected.reduce((sum, p) => sum + Number(p.price) * orderSelection.get(p.id).quantity, 0)) : 'Por confirmar';
-        const message = `Hola, me interesan las siguientes prendas:\n${lines.join('\n')}\n\n${selected.length} producto(s), ${selected.reduce((sum, p) => sum + orderSelection.get(p.id).quantity, 0)} pieza(s)\nTotal: ${total}`;
+        const calculation = calculateOrder(selected);
+        const total = calculation.completePrice ? money(calculation.total) : 'Por confirmar';
+        const message = `Hola, me interesan las siguientes prendas:\n${lines.join('\n')}\n\n${selected.length} producto(s), ${selected.reduce((sum, p) => sum + orderSelection.get(p.id).quantity, 0)} pieza(s)\n${calculation.discount ? 'Descuento por conjunto: −' + money(calculation.discount) + '\n' : ''}Total: ${total}`;
         console.log(message);
         alert(message);
     });
@@ -430,7 +431,7 @@ function getRelationScore(
 function renderQuantity(item) {
     return `<div class="quantity-control" role="group" aria-label="Cantidad de ${item.name || item.model}">
         <button type="button" data-quantity-step="-1" aria-label="Quitar una pieza de ${item.name || item.model}">−</button>
-        <label class="quantity-value"><input type="number" min="1" step="1" value="1" inputmode="numeric"
+        <label class="quantity-value"><input type="number" min="1" max="5" step="1" value="1" inputmode="numeric"
             data-quantity-for="${item.id}" aria-label="Cantidad de ${item.name || item.model}"><span>pzas</span></label>
         <button type="button" data-quantity-step="1" aria-label="Añadir una pieza de ${item.name || item.model}">+</button>
     </div>`;
@@ -450,9 +451,9 @@ function moveCollectionCard(input) {
 }
 
 function quantityLimit(item, size) {
-    if (typeof item.stock === 'number') return item.stock;
-    if (size && item.stock && typeof item.stock === 'object') return item.stock[size] ?? 0;
-    return Infinity;
+    if (typeof item.stock === 'number') return Math.min(5, item.stock);
+    if (size && item.stock && typeof item.stock === 'object') return Math.min(5, item.stock[size] ?? 0);
+    return 5;
 }
 
 function syncQuantityLimit(item) {
@@ -503,6 +504,25 @@ function setupImageViewer() {
     document.body.appendChild(dialog);
     const img = dialog.querySelector('img');
     const stage = dialog.querySelector('.viewer-stage');
+    const photos = getProductImages(product);
+    let photoIndex = 0;
+    if (photos.length > 1) {
+        dialog.insertAdjacentHTML('beforeend', '<button type="button" class="viewer-arrow viewer-prev" aria-label="Foto anterior">‹</button><button type="button" class="viewer-arrow viewer-next" aria-label="Foto siguiente">›</button><span class="viewer-counter" role="status"></span>');
+        dialog.querySelector('.viewer-prev').addEventListener('click', () => changePhoto(-1));
+        dialog.querySelector('.viewer-next').addEventListener('click', () => changePhoto(1));
+        dialog.addEventListener('keydown', event => {
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                event.preventDefault(); changePhoto(event.key === 'ArrowLeft' ? -1 : 1);
+            }
+        });
+    }
+    function changePhoto(direction) {
+        photoIndex = (photoIndex + direction + photos.length) % photos.length;
+        resetZoom();
+        img.src = photos[photoIndex];
+        stage.scrollTop = 0; stage.scrollLeft = 0;
+        dialog.querySelector('.viewer-counter').textContent = (photoIndex + 1) + ' / ' + photos.length;
+    }
     let zoomed = false;
     function resetZoom() {
         zoomed = false;
@@ -513,6 +533,8 @@ function setupImageViewer() {
     }
     function open() {
         img.src = main.src; img.alt = main.alt;
+        photoIndex = Math.max(0, photos.findIndex(path => new URL(path, document.baseURI).href === main.src));
+        if (photos.length > 1) changePhoto(0);
         resetZoom(); dialog.showModal(); document.body.classList.add('viewer-open');
     }
     function zoom() {
@@ -533,4 +555,17 @@ function setupImageViewer() {
     dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });
     dialog.addEventListener('close', () => { resetZoom(); document.body.classList.remove('viewer-open'); main.focus({preventScroll:true}); });
     window.addEventListener('resize', resetZoom);
+}
+
+// Un descuento fijo por colección al incluir al menos dos piezas.
+function calculateOrder(selected) {
+    const completePrice = selected.every(knownPrice);
+    const subtotal = selected.reduce((sum, item) => sum + (knownPrice(item) ? Number(item.price) * orderSelection.get(item.id).quantity : 0), 0);
+    const collections = new Map();
+    selected.forEach(item => {
+        if (!item.collection) return;
+        collections.set(item.collection, (collections.get(item.collection) || 0) + orderSelection.get(item.id).quantity);
+    });
+    const discount = completePrice ? Math.min(subtotal, [...collections.values()].filter(count => count >= 2).length * 150) : 0;
+    return { completePrice, subtotal, discount, total: subtotal - discount };
 }

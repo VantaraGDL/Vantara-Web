@@ -210,63 +210,6 @@ const products = [
         "collection": "desert-taupe"
     },
     {
-        "id": 17,
-        "brand": "Hellstar",
-        "category": "T-Shirts",
-        "model": "Paradise Graphic",
-        "color": "Black",
-        "price": null,
-        "featured": true,
-        "name": "Hellstar T-shirt Paradise Graphic",
-        "images": []
-    },
-    {
-        "id": 18,
-        "brand": "Hellstar",
-        "category": "T-Shirts",
-        "model": "Graphic 02",
-        "color": "White",
-        "price": null,
-        "featured": false,
-        "name": "Hellstar T-shirt Graphic 02",
-        "images": []
-    },
-    {
-        "id": 19,
-        "brand": "Hellstar",
-        "category": "T-Shirts",
-        "model": "Graphic 03",
-        "color": "Black",
-        "price": null,
-        "featured": false,
-        "name": "Hellstar T-shirt Graphic 03",
-        "images": []
-    },
-    {
-        "id": 20,
-        "brand": "Hellstar",
-        "category": "T-Shirts",
-        "model": "Logo Graphic",
-        "color": "Black",
-        "price": null,
-        "featured": false,
-        "name": "Hellstar T-shirt Logo Graphic",
-        "images": []
-    },
-    {
-        "id": 21,
-        "brand": "Van Cleef",
-        "category": "Accessories",
-        "model": "Pulsera Clover",
-        "color": "Black",
-        "material": "Plata 925",
-        "finish": "Plateado",
-        "price": null,
-        "featured": false,
-        "name": "Van Cleef Pulsera Clover",
-        "images": []
-    },
-    {
         "id": 22,
         "featured": false,
         "name": "Essentials Short Fleece Black",
@@ -388,6 +331,127 @@ const products = [
         "price": 1399,
         "images": [
             "assets/img/catalogo/alo-hoodie-negro.png"
+        ]
+    },
+    {
+        "id": 32,
+        "brand": "Van Cleef",
+        "category": "Accessories",
+        "name": "Van Cleef Pulsera Oro-Negro",
+        "model": "Oro-Negro",
+        "price": 1699,
+        "material": "Baño de oro",
+        "description": "Pulsera bañada en oro, con detalles en color negro.",
+        "sizes": [],
+        "featured": false,
+        "images": [
+            "assets/img/catalogo/van-cleef-pulsera-dorado-negro.png"
+        ]
+    },
+    {
+        "id": 33,
+        "brand": "Van Cleef",
+        "category": "Accessories",
+        "name": "Van Cleef Pulsera Oro-Rosa",
+        "model": "Oro-Rosa",
+        "price": 1699,
+        "material": "Baño de oro",
+        "description": "Pulsera bañada en oro, con detalles en color rosa.",
+        "sizes": [],
+        "featured": false,
+        "images": [
+            "assets/img/catalogo/van-cleef-pulsera-dorado-rosa.png"
+        ]
+    },
+    {
+        "id": 34,
+        "brand": "Van Cleef",
+        "category": "Accessories",
+        "name": "Van Cleef Pulsera Oro-Azul",
+        "model": "Oro-Azul",
+        "price": 1699,
+        "material": "Baño de oro",
+        "description": "Pulsera bañada en oro, con detalles en color azul.",
+        "sizes": [],
+        "featured": false,
+        "images": [
+            "assets/img/catalogo/van-cleef-pulsera-dorado-azul.png"
+        ]
+    },
+    {
+        "id": 35,
+        "brand": "Van Cleef",
+        "category": "Accessories",
+        "name": "Van Cleef Pulsera Oro-Verde",
+        "model": "Oro-Verde",
+        "price": 1699,
+        "material": "Baño de oro",
+        "description": "Pulsera bañada en oro, con detalles en color verde.",
+        "sizes": [],
+        "featured": false,
+        "images": [
+            "assets/img/catalogo/van-cleef-pulsera-dorado-verde-1.png",
+            "assets/img/catalogo/van-cleef-pulsera-dorado-verde-2.png"
+        ]
+    },
+    {
+        "id": 37,
+        "brand": "Van Cleef",
+        "category": "Accessories",
+        "name": "Van Cleef Pulsera Plata-Blanco/Negro",
+        "model": "Plata-Blanco/Negro",
+        "price": 1699,
+        "material": "Plata",
+        "description": "Pulsera hecha de plata, con detalles en color blanco y negro.",
+        "sizes": [],
+        "featured": false,
+        "images": [
+            "assets/img/catalogo/van-cleef-pulsera-blanco-negro.png"
+        ]
+    },
+    {
+        "id": 38,
+        "brand": "Van Cleef",
+        "category": "Accessories",
+        "name": "Van Cleef Pulsera Plata-Blanco/Azul",
+        "model": "Plata-Blanco/Azul",
+        "price": 1699,
+        "material": "Plata",
+        "description": "Pulsera hecha de plata, con detalles en color blanco y azul.",
+        "sizes": [],
+        "featured": false,
+        "images": [
+            "assets/img/catalogo/van-cleef-pulsera-blanco-azul.png"
+        ]
+    },
+    {
+        "id": 39,
+        "brand": "Van Cleef",
+        "category": "Accessories",
+        "name": "Van Cleef Pulsera Plata/Azul Celeste",
+        "model": "Plata/Azul Celeste",
+        "price": 1699,
+        "material": "Plata",
+        "description": "Pulsera hecha de plata, con detalles en color azul celeste.",
+        "sizes": [],
+        "featured": false,
+        "images": [
+            "assets/img/catalogo/van-cleef-pulsera-azul-bajito.png"
+        ]
+    },
+    {
+        "id": 40,
+        "brand": "Van Cleef",
+        "category": "Accessories",
+        "name": "Van Cleef Pulsera Plata/Azul Marino",
+        "model": "Plata/Azul Marino",
+        "price": 1699,
+        "material": "Plata",
+        "description": "Pulsera hecha de plata, con detalles en color azul marino.",
+        "sizes": [],
+        "featured": false,
+        "images": [
+            "assets/img/catalogo/van-cleef-pulsera-azul-marino.png"
         ]
     }
 ];
