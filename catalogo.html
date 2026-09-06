@@ -124,61 +124,16 @@
 
         <section class="catalog-controls">
 
-            <div class="category-filters">
-
-                <button
-                    class="filter-button active" aria-pressed="true"
-                    data-category="all"
-                >
-                    Todo
-                </button>
-
-                <button
-                    class="filter-button" aria-pressed="false"
-                    data-category="T-Shirts"
-                >
-                    Playeras
-                </button>
-
-                <button
-                    class="filter-button" aria-pressed="false"
-                    data-category="Hoodies"
-                >
-                    Hoodies
-                </button>
-
-                <button
-                    class="filter-button" aria-pressed="false"
-                    data-category="Sueter"
-                >
-                    Sueter
-                </button>
-
-                <button
-                    class="filter-button" aria-pressed="false"
-                    data-category="Pants"
-                >
-                    Pants
-                </button>
-
-                <button
-                    class="filter-button" aria-pressed="false"
-                    data-category="Shorts"
-                >
-                    Shorts
-                </button>
-
-                <button
-                    class="filter-button" aria-pressed="false"
-                    data-category="Accessories"
-                >
-                    Accesorios
-                </button>
-
-            </div>
-
-
             <div class="catalog-tools">
+                <select id="category-filter" aria-label="Categoría">
+                    <option value="all">Todas las prendas</option>
+                    <option value="T-Shirts">Playeras</option>
+                    <option value="Hoodies">Hoodies</option>
+                    <option value="Sueter">Suéteres</option>
+                    <option value="Pants">Pants</option>
+                    <option value="Shorts">Shorts</option>
+                    <option value="Accessories">Accesorios</option>
+                </select>
 
                 <input
                     type="search"
@@ -216,6 +171,10 @@
                 </select>
 
 
+                <details class="sort-menu">
+                    <summary>Ordenar por</summary>
+                    <div class="sort-options">
+                        <label for="sort-filter">Orden</label>
                 <select
                     id="sort-filter"
                     aria-label="Ordenar productos"
@@ -242,6 +201,9 @@
                     </option>
 
                 </select>
+                        <label class="stock-filter-label"><input type="checkbox" id="stock-only"> Solo productos con existencias</label>
+                    </div>
+                </details>
 
             </div>
 
@@ -361,3 +323,4 @@
     
 </body>
 </html>
+

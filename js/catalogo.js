@@ -1,8 +1,8 @@
 const catalogContainer =
     document.querySelector("#catalog-products");
 
-const categoryButtons =
-    document.querySelectorAll(".filter-button");
+const categoryFilter = document.querySelector("#category-filter");
+const stockOnly = document.querySelector("#stock-only");
 
 const brandFilter =
     document.querySelector("#brand-filter");
@@ -35,9 +35,7 @@ function updateBrandOptions() {
             return true;
         }
 
-        return selectedCategory === "Accessories"
-            ? option.value === "Van Cleef"
-            : option.value !== "Van Cleef";
+        return products.some(product => product.category === selectedCategory && product.brand === option.value);
     });
 
     if (!availableOptions.some(option => option.value === selectedBrand)) {
@@ -77,7 +75,8 @@ function renderCatalog() {
             return (
                 matchesCategory &&
                 matchesBrand &&
-                matchesSearch
+                matchesSearch &&
+                (!stockOnly.checked || getTotalStock(product) > 0)
             );
 
         });
@@ -305,31 +304,22 @@ function comparePrice(
 
 }
 
-categoryButtons.forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        categoryButtons.forEach(button => {
-            button.classList.remove("active");
-            button.setAttribute("aria-pressed", "false");
-        });
-
-
-        button.classList.add("active");
-        button.setAttribute("aria-pressed", "true");
-
-
-        selectedCategory =
-            button.dataset.category;
-
-        updateBrandOptions();
-
-        renderCatalog();
-
-    });
-
+categoryFilter.addEventListener("change", () => {
+    selectedCategory = categoryFilter.value;
+    updateBrandOptions();
+    renderCatalog();
 });
-
+stockOnly.addEventListener("change", renderCatalog);
+document.addEventListener("click", event => {
+    const menu = document.querySelector(".sort-menu");
+    if (!menu.contains(event.target)) menu.open = false;
+});
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        const menu = document.querySelector(".sort-menu");
+        if (menu.open) { menu.open = false; menu.querySelector("summary").focus(); }
+    }
+});
 
 brandFilter.addEventListener("change", () => {
 

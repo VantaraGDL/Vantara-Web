@@ -15,6 +15,7 @@ create table public.products (
     brand text not null,
     category text not null check (category in ('Hoodies','T-Shirts','Sueter','Pants','Shorts','Accessories')),
     model text not null,
+    collection text,
     color text,
     material text,
     finish text,

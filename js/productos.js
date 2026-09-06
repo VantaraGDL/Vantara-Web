@@ -10,7 +10,8 @@ const products = [
         "name": "Essentials Hoodie Strech Lim",
         "images": [
             "assets/img/catalogo/essentials-hoodie-strech-lim.png"
-        ]
+        ],
+        "collection": "strech-lim"
     },
     {
         "id": 2,
@@ -37,7 +38,8 @@ const products = [
         "featured": true,
         "images": [
             "assets/img/catalogo/essentials-hoodie-light-oatmeal.png"
-        ]
+        ],
+        "collection": "light-oatmeal"
     },
     {
         "id": 3,
@@ -50,7 +52,8 @@ const products = [
         "name": "Essentials Hoodie Dark Oatmeal",
         "images": [
             "assets/img/catalogo/essentials-hoodie-dark-oatmeal.png"
-        ]
+        ],
+        "collection": "dark-oatmeal"
     },
     {
         "id": 4,
@@ -63,7 +66,8 @@ const products = [
         "name": "Essentials Hoodie Fleece Black",
         "images": [
             "assets/img/catalogo/essentials-hoodie-fleece-black.png"
-        ]
+        ],
+        "collection": "fleece-black"
     },
     {
         "id": 5,
@@ -76,7 +80,8 @@ const products = [
         "name": "Essentials Hoodie Desert Sand",
         "images": [
             "assets/img/catalogo/essentials-hoodie-desert-sand.png"
-        ]
+        ],
+        "collection": "desert-sand"
     },
     {
         "id": 6,
@@ -89,7 +94,8 @@ const products = [
         "name": "Essentials Hoodie Dusty Beige",
         "images": [
             "assets/img/catalogo/essentials-hoodie-dusty-beige.png"
-        ]
+        ],
+        "collection": "dusty-beige"
     },
     {
         "id": 8,
@@ -102,7 +108,8 @@ const products = [
         "name": "Essentials T-shirt Light Oatmeal",
         "images": [
             "assets/img/catalogo/essentials-t-shirt-light-oatmeal.png"
-        ]
+        ],
+        "collection": "light-oatmeal"
     },
     {
         "id": 9,
@@ -115,7 +122,8 @@ const products = [
         "name": "Essentials T-shirt Bright White",
         "images": [
             "assets/img/catalogo/essentials-t-shirt-bright-white.jpg"
-        ]
+        ],
+        "collection": "bright-white"
     },
     {
         "id": 10,
@@ -128,7 +136,8 @@ const products = [
         "name": "Essentials T-shirt Fleece Black",
         "images": [
             "assets/img/catalogo/essentials-t-shirt-fleece-black.jpg"
-        ]
+        ],
+        "collection": "fleece-black"
     },
     {
         "id": 11,
@@ -141,7 +150,8 @@ const products = [
         "name": "Essentials T-shirt Dusty Beige",
         "images": [
             "assets/img/catalogo/essentials-t-shirt-dusty-beige.png"
-        ]
+        ],
+        "collection": "dusty-beige"
     },
     {
         "id": 12,
@@ -154,7 +164,8 @@ const products = [
         "name": "Essentials Pants Dark Oatmeal",
         "images": [
             "assets/img/catalogo/essentials-pants-dark-oatmeal.jpg"
-        ]
+        ],
+        "collection": "dark-oatmeal"
     },
     {
         "id": 14,
@@ -167,7 +178,8 @@ const products = [
         "name": "Essentials Pants Dusty Beige",
         "images": [
             "assets/img/catalogo/essentials-pants-dusty-beige.jpg"
-        ]
+        ],
+        "collection": "dusty-beige"
     },
     {
         "id": 15,
@@ -180,7 +192,8 @@ const products = [
         "name": "Essentials Pants Fleece Black",
         "images": [
             "assets/img/catalogo/essentials-pants-fleece-black.jpg"
-        ]
+        ],
+        "collection": "fleece-black"
     },
     {
         "id": 16,
@@ -193,7 +206,8 @@ const products = [
         "name": "Essentials Short Desert Taupe",
         "images": [
             "assets/img/catalogo/essentials-short-desert-taupe.jpg"
-        ]
+        ],
+        "collection": "desert-taupe"
     },
     {
         "id": 17,
@@ -262,7 +276,8 @@ const products = [
         "price": 899,
         "images": [
             "assets/img/catalogo/essentials-short-fleece-black.png"
-        ]
+        ],
+        "collection": "fleece-black"
     },
     {
         "id": 23,
@@ -274,7 +289,8 @@ const products = [
         "price": 899,
         "images": [
             "assets/img/catalogo/essentials-short-dusty-beige.jpg"
-        ]
+        ],
+        "collection": "dusty-beige"
     },
     {
         "id": 24,
@@ -286,7 +302,8 @@ const products = [
         "price": 899,
         "images": [
             "assets/img/catalogo/essentials-short-strech-lim.jpg"
-        ]
+        ],
+        "collection": "strech-lim"
     },
     {
         "id": 25,
@@ -298,7 +315,8 @@ const products = [
         "price": 1199,
         "images": [
             "assets/img/catalogo/essentials-pants-light-health.png"
-        ]
+        ],
+        "collection": "light-health"
     },
     {
         "id": 26,
