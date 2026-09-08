@@ -1,4 +1,5 @@
 -- Preparación para un proyecto Supabase nuevo. Aún no aplicada.
+-- LEGACY: propuesta histórica. NO ejecutar; usar migrations/ y MIGRACION.md.
 begin;
 create table public.catalog_admins (
     user_id uuid primary key references auth.users(id) on delete cascade

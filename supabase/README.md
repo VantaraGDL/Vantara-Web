@@ -1,5 +1,7 @@
 # Preparación de Supabase y panel admin
 
+> **Actualización 2026-09-08:** la guía vigente es [MIGRACION.md](MIGRACION.md), con esquema normalizado y snapshot en `migrations/`. No ejecutes `001_catalog.sql` junto con esas migraciones. El contenido siguiente se conserva como propuesta histórica y no es el procedimiento actual.
+
 Estado: propuesta preparada, sin conexión ni migraciones ejecutadas. El frontend sigue usando `js/productos.js`. No existe todavía un panel conectado.
 
 ## Integración prevista
