@@ -15,12 +15,12 @@ do $$ begin
 end $$;
 -- Con todos los productos ocultos, ninguna taxonomía debe ser pública.
 set local role anon;
-do $ declare t text; n bigint; begin
+do $$ declare t text; n bigint; begin
   foreach t in array array['brands','categories','collections','products','product_variants','product_images'] loop
     execute format('select count(*) from public.%I', t) into n;
     assert n = 0, 'Datos ocultos expuestos: ' || t;
   end loop;
-end $;
+end $$;
 reset role;
 -- Un producto publicado temporalmente para comprobar acceso a sus hijos.
 update public.products set published = true where id = 2;
@@ -36,7 +36,7 @@ do $$ begin
 end $$;
 -- Intentos reales de escritura, además de inspección de privilegios.
 -- Solo insufficient_privilege cuenta como bloqueo válido.
-do $ declare t text; op text; statement text; blocked boolean; begin
+do $$ declare t text; op text; statement text; blocked boolean; begin
   foreach t in array array['catalog_admins','brands','categories','collections','products','product_variants','product_images'] loop
     foreach op in array array['INSERT','UPDATE','DELETE'] loop
       assert not has_table_privilege(current_user, 'public.' || t, op),
@@ -55,7 +55,7 @@ do $ declare t text; op text; statement text; blocked boolean; begin
       assert blocked, 'Escritura anónima permitida: ' || t || ' ' || op;
     end loop;
   end loop;
-end $;
+end $$;
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000001","role":"authenticated"}', true);
 set local role authenticated;
