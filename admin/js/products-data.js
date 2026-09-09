@@ -15,14 +15,16 @@ export async function allRows(client, table, columns) {
   const rows=[];
   for(let i=0;;i+=500){const r=await client.from(table).select(columns).order('id').range(i,i+499);if(r.error)throw new Error('No se pudo leer '+table+'. Revisa tu conexión y acceso.');rows.push(...r.data);if(r.data.length<500)return rows;}
 }
-// Guardar solo diferencias. Cada respuesta debe confirmar la fila afectada por RLS.
+// Una RPC: el servidor confirma todos los cambios o revierte la operación.
 export async function saveChanges(client, original, patch, variants) {
   const changes=Object.fromEntries(Object.entries(patch).filter(([k,v])=>original[k]!==v));
-  const tasks=[];
-  if(Object.keys(changes).length)tasks.push(async()=>{const r=await client.from('products').update(changes).eq('id',original.id).select('id').single();if(r.error)throw r.error;Object.assign(original,changes);});
-  for(const v of variants){const old=original.product_variants.find(x=>x.id===v.id);if(old.stock!==v.stock)tasks.push(async()=>{const r=await client.from('product_variants').update({stock:v.stock}).eq('id',v.id).eq('product_id',original.id).select('id').single();if(r.error)throw r.error;old.stock=v.stock;});}
-  let saved=0;
-  try{for(const task of tasks){await task();saved++;}}
-  catch{throw new Error(`No se completó el guardado (${saved} de ${tasks.length} cambios confirmados). Tus valores siguen en el formulario. Comprueba la conexión y vuelve a guardar; no recargues si quieres conservarlos.`);}
-  return tasks.length;
+  const stocks=variants.filter(v=>original.product_variants.find(x=>x.id===v.id)?.stock!==v.stock);
+  if(!Object.keys(changes).length && !stocks.length)return 0;
+  let result;
+  try { result=await client.rpc('update_catalog_product',{p_product_id:original.id,p_changes:changes,p_variants:stocks}); }
+  catch { throw new Error('No se pudo confirmar el guardado. Tus cambios siguen en el formulario; comprueba la conexión y reintenta.'); }
+  if(result.error)throw new Error('No se pudo guardar el producto y sus tallas. Revisa los valores y tu acceso. Tus cambios siguen en el formulario.');
+  Object.assign(original,changes);
+  for(const v of stocks)original.product_variants.find(x=>x.id===v.id).stock=v.stock;
+  return 1;
 }
