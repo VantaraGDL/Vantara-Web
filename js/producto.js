@@ -1,3 +1,7 @@
+import {catalogApi} from './catalog-api.js';
+import {escapeHTML,productSizes,sizeUnavailable,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js';
+import {getProductImages,createProductCard} from './product-ui.js';
+let products=[],product;
 const productDetail =
     document.querySelector("#product-detail");
 
@@ -19,34 +23,32 @@ const productId =
     Number(params.get("id"));
 
 
-const product =
-    products.find(
-        product => product.id === productId
-    );
-
-
 const orderSelection = new Map();
-if (product) orderSelection.set(product.id, { size: null, quantity: 1 });
-
-if (!product) {
-
-    document.title = "Producto no encontrado | Vant'ara";
-    const robots = document.createElement("meta");
-    robots.name = "robots";
-    robots.content = "noindex";
-    document.head.appendChild(robots);
-    productDetail.hidden = true;
-    productError.hidden = false;
-    relatedSection.hidden = true;
-
-} else {
-
-    renderProduct(product);
-    renderRelatedProducts(product);
-
+async function loadProduct() {
+    productDetail.hidden=true;relatedSection.hidden=true;productError.hidden=false;
+    productError.querySelector('h1').textContent='Cargando producto…';
+    productError.querySelector('p').textContent='';
+    try {
+        products=await catalogApi.loadProducts();
+        product=products.find(p=>p.id===productId);
+        if(!product){
+            document.title="Producto no encontrado | Vant'ara";
+            const robots=document.createElement('meta');robots.name='robots';robots.content='noindex';document.head.appendChild(robots);
+            productError.querySelector('h1').textContent='Producto no encontrado';
+            productError.querySelector('p').textContent='El producto que buscas no existe o ya no está disponible.';
+            return;
+        }
+        orderSelection.set(product.id,{size:null,quantity:1});
+        productError.hidden=true;productDetail.hidden=false;relatedSection.hidden=false;
+        renderProduct(product);renderRelatedProducts(product);
+        if(products.some(p=>p.imageError))document.querySelector('#order-error').textContent='Algunas imágenes no pudieron cargarse. Puedes recargar para reintentar.';
+    }catch{
+        productDetail.hidden=true;relatedSection.hidden=true;productError.hidden=false;productError.setAttribute('role','alert');
+        productError.querySelector('h1').textContent='No se pudo cargar el producto';
+        productError.querySelector('p').textContent='Revisa tu conexión y recarga la página para reintentar.';
+    }
 }
-
-
+loadProduct();
 
 function renderProduct(product) {
     document.querySelector(".back-link").href = "catalogo.html?category=" + encodeURIComponent(product.category);
@@ -59,7 +61,7 @@ function renderProduct(product) {
             ];
 
 
-    const price = product.price
+    const price = knownPrice(product)
         ? `$${product.price} MXN`
         : "Precio próximamente";
 
@@ -77,8 +79,8 @@ function renderProduct(product) {
 
                 <img
                 id="main-product-image"
-                src="${images[0]}"
-                alt="${product.name || product.model}"
+                src="${escapeHTML(images[0])}"
+                alt="${escapeHTML(product.name || product.model)}"
                 >
 
             </div>
@@ -88,12 +90,12 @@ function renderProduct(product) {
                 ${images.map((image, index) => `
                     <button
                         class="thumbnail-button ${index === 0 ? "active" : ""}"
-                        data-image="${image}"
+                        data-image="${escapeHTML(image)}"
                         aria-label="Ver imagen ${index + 1}"
                         aria-pressed="${index === 0}"
                     >
                         <img
-                            src="${image}"
+                            src="${escapeHTML(image)}"
                             alt="Vista ${index + 1}"
                         >
                     </button>
@@ -107,12 +109,12 @@ function renderProduct(product) {
         <div class="product-data">
 
             <p class="product-brand-detail">
-                ${product.brand}
+                ${escapeHTML(product.brand)}
             </p>
 
 
             <h1>
-                ${product.name || product.model}
+                ${escapeHTML(product.name || product.model)}
             </h1>
 
 
@@ -125,7 +127,7 @@ function renderProduct(product) {
                 <div class="product-option">
                     <p class="product-option-label">Material</p>
                     <p class="product-option-value">
-                        ${product.material?.trim() || "Pendiente"}
+                        ${escapeHTML(product.material?.trim() || "Pendiente")}
                     </p>
                 </div>
 
@@ -145,7 +147,7 @@ function renderProduct(product) {
                 <summary><h2>Descripción</h2><span class="accordion-icon" aria-hidden="true"></span></summary>
                 <p>
                     ${product.description?.trim() && !/^[.\s…]+$/.test(product.description)
-                        ? product.description
+                        ? escapeHTML(product.description)
                         : "Descripción pendiente."}
                 </p>
             </details>
@@ -180,27 +182,14 @@ function renderProduct(product) {
     setupImageViewer();
 }
 
-function productSizes(item) {
-    return item.sizes || (item.category === "Accessories" ? [] : ["S", "M", "L", "XL"]);
-}
-
-function sizeUnavailable(item, size) {
-    if (typeof item.stock === "number") return item.stock <= 0;
-    return item.stock && typeof item.stock === "object" && (item.stock[size] ?? 0) <= 0;
-}
-
-function knownPrice(item) {
-    return item.price !== null && item.price !== undefined && Number.isFinite(Number(item.price));
-}
-
 function money(value) {
     return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(value) + " MXN";
 }
 
 function createSizes(item) {
     return productSizes(item).map(size => `
-        <button type="button" class="size-button" aria-pressed="false" data-size="${size}"
-            ${sizeUnavailable(item, size) ? 'disabled title="Talla agotada"' : ''}>${size}</button>
+        <button type="button" class="size-button" aria-pressed="false" data-size="${escapeHTML(size)}"
+            ${sizeUnavailable(item, size) ? 'disabled title="Talla agotada"' : ''}>${escapeHTML(size)}</button>
     `).join("");
 }
 
@@ -208,19 +197,19 @@ function renderCollection(current) {
     if (!current.collection) return "";
     const members = products.filter(p => p.id !== current.id && p.collection === current.collection);
     if (members.length === 0) return "";
-    const title = current.collection.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+    const title = current.collectionName;
     return `<section class="outfit" aria-labelledby="outfit-title">
-        <h2 id="outfit-title">Arma tu conjunto — ${title}</h2>
+        <h2 id="outfit-title">Arma tu conjunto — ${escapeHTML(title)}</h2>
         <p class="outfit-hint">Agrega otras prendas si quieres completar tu conjunto. El total incluye el producto actual.</p>
         <div class="outfit-list">${members.map((item, index) => `
             <article class="outfit-card" data-outfit-id="${item.id}" data-original-order="${index}">
-                <img src="${getProductImages(item)[0] || 'assets/img/producto-pendiente.svg'}" alt="${item.name || item.model}">
+                <img src="${escapeHTML(getProductImages(item)[0] || 'assets/img/producto-pendiente.svg')}" alt="${escapeHTML(item.name || item.model)}">
                 <div class="outfit-info">
                     <label><input type="checkbox" data-outfit-select="${item.id}">
-                        <span>${item.name || item.model}</span></label>
+                        <span>${escapeHTML(item.name || item.model)}</span></label>
                     <p>${knownPrice(item) ? money(item.price) : 'Precio por confirmar'}</p>
                     <fieldset data-sizes-for="${item.id}" hidden>
-                        <legend>Talla — ${item.name || item.model}</legend>
+                        <legend>Talla — ${escapeHTML(item.name || item.model)}</legend>
                         <div class="size-quantity-row"><div class="size-list">${createSizes(item) || 'No requiere talla'}</div>${renderQuantity(item)}</div>
                     </fieldset>
                 </div>
@@ -435,11 +424,11 @@ function getRelationScore(
  
 
 function renderQuantity(item) {
-    return `<div class="quantity-control" role="group" aria-label="Cantidad de ${item.name || item.model}">
-        <button type="button" data-quantity-step="-1" aria-label="Quitar una pieza de ${item.name || item.model}">−</button>
+    return `<div class="quantity-control" role="group" aria-label="Cantidad de ${escapeHTML(item.name || item.model)}">
+        <button type="button" data-quantity-step="-1" aria-label="Quitar una pieza de ${escapeHTML(item.name || item.model)}">−</button>
         <label class="quantity-value"><input type="number" min="1" max="5" step="1" value="1" inputmode="numeric"
-            data-quantity-for="${item.id}" aria-label="Cantidad de ${item.name || item.model}"><span>pzas</span></label>
-        <button type="button" data-quantity-step="1" aria-label="Añadir una pieza de ${item.name || item.model}">+</button>
+            data-quantity-for="${item.id}" aria-label="Cantidad de ${escapeHTML(item.name || item.model)}"><span>pzas</span></label>
+        <button type="button" data-quantity-step="1" aria-label="Añadir una pieza de ${escapeHTML(item.name || item.model)}">+</button>
     </div>`;
 }
 
@@ -454,12 +443,6 @@ function moveCollectionCard(input) {
     cards.forEach(card => list.appendChild(card));
     input.focus({ preventScroll: true });
     if (input.checked) list.scrollLeft = 0;
-}
-
-function quantityLimit(item, size) {
-    if (typeof item.stock === 'number') return Math.min(5, item.stock);
-    if (size && item.stock && typeof item.stock === 'object') return Math.min(5, item.stock[size] ?? 0);
-    return 5;
 }
 
 function syncQuantityLimit(item) {
@@ -563,15 +546,4 @@ function setupImageViewer() {
     window.addEventListener('resize', resetZoom);
 }
 
-// Un descuento fijo por colección al incluir al menos dos piezas.
-function calculateOrder(selected) {
-    const completePrice = selected.every(knownPrice);
-    const subtotal = selected.reduce((sum, item) => sum + (knownPrice(item) ? Number(item.price) * orderSelection.get(item.id).quantity : 0), 0);
-    const collections = new Map();
-    selected.forEach(item => {
-        if (!item.collection) return;
-        collections.set(item.collection, (collections.get(item.collection) || 0) + orderSelection.get(item.id).quantity);
-    });
-    const discount = completePrice ? Math.min(subtotal, [...collections.values()].filter(count => count >= 2).length * 150) : 0;
-    return { completePrice, subtotal, discount, total: subtotal - discount };
-}
+function calculateOrder(selected) { return orderTotals(selected,orderSelection); }

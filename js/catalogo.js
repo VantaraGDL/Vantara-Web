@@ -1,3 +1,8 @@
+import {catalogApi} from './catalog-api.js';
+import {getTotalStock} from './catalog-logic.js';
+import {createProductCard} from './product-ui.js';
+let products=[];
+let loadError=false;
 const catalogContainer =
     document.querySelector("#catalog-products");
 
@@ -7,8 +12,7 @@ const stockOnly = document.querySelector("#stock-only");
 const brandFilter =
     document.querySelector("#brand-filter");
 
-const brandOptions =
-    Array.from(brandFilter.options);
+let brandOptions = [];
 
 const noProductsMessage =
     document.querySelector("#no-products");
@@ -34,11 +38,11 @@ let selectedSort = "default";
 function updateBrandOptions() {
 
     const availableOptions = brandOptions.filter(option => {
-        if (option.value === "all" || selectedCategory === "all") {
+        if (option.value === "all") {
             return true;
         }
 
-        return products.some(product => product.category === selectedCategory && product.brand === option.value);
+        return products.some(product => (selectedCategory === "all" || product.category === selectedCategory) && product.brand === option.value);
     });
 
     if (!availableOptions.some(option => option.value === selectedBrand)) {
@@ -51,6 +55,7 @@ function updateBrandOptions() {
 }
 
 function renderCatalog() {
+    if(loadError)return;
 
     catalogContainer.innerHTML = "";
 
@@ -363,5 +368,22 @@ sortFilter.addEventListener(
     }
 );
 
-updateBrandOptions();
-renderCatalog();
+async function loadCatalog() {
+    catalogCount.textContent='Cargando catálogo…';
+    catalogCount.setAttribute('role','status');
+    try {
+        products=await catalogApi.loadProducts();
+        const option=(value,text)=>{const o=document.createElement('option');o.value=value;o.textContent=text;return o;};
+        brandOptions=[option('all','Todas las marcas'),...[...new Set(products.map(p=>p.brand))].sort().map(name=>option(name,name))];
+        const known=new Set([...categoryFilter.options].map(o=>o.value));
+        for(const p of products)if(!known.has(p.category)){categoryFilter.append(option(p.category,p.categoryName));known.add(p.category);}
+        noProductsMessage.textContent=products.length ? 'No se encontraron productos con estos filtros.' : 'No hay productos disponibles por el momento.';
+        updateBrandOptions();renderCatalog();
+        if(products.some(p=>p.imageError))catalogCount.textContent+=' · Algunas imágenes no pudieron cargarse.';
+    } catch {
+        loadError=true;catalogCount.textContent='';noProductsMessage.hidden=false;
+        noProductsMessage.textContent='No se pudo cargar el catálogo. Recarga la página para reintentar.';
+        noProductsMessage.setAttribute('role','alert');
+    }
+}
+loadCatalog();
