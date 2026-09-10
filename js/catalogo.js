@@ -1,6 +1,6 @@
-import {catalogApi} from './catalog-api.js';
-import {getTotalStock} from './catalog-logic.js';
-import {createProductCard} from './product-ui.js';
+import {catalogApi} from './catalog-api.js?v=supabase-2';
+import {getTotalStock} from './catalog-logic.js?v=supabase-2';
+import {createProductCard} from './product-ui.js?v=supabase-2';
 let products=[];
 let loadError=false;
 const catalogContainer =

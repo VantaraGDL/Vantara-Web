@@ -1,4 +1,4 @@
-import {projectUrl, publishableKey} from '../admin/js/config.js';
+import {projectUrl, publishableKey} from '../admin/js/config.js?v=supabase-2';
 
 // Public requests deliberately never read the admin session or send its JWT.
 export const PRODUCT_SELECT = 'id,name,model,color,material,finish,description,price,featured,published,position,requires_size,max_quantity,brands(id,name),categories(id,name),collections(id,name,discount_enabled,discount_amount,minimum_pieces),product_variants(id,size,stock,position),product_images(id,path,alt,position,bucket_id,media_state)';

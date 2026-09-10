@@ -1,5 +1,5 @@
-import {catalogApi} from './catalog-api.js';
-import {createProductCard} from './product-ui.js';
+import {catalogApi} from './catalog-api.js?v=supabase-2';
+import {createProductCard} from './product-ui.js?v=supabase-2';
 const container=document.querySelector('#featured-products');
 const status=document.createElement('p');
 status.setAttribute('role','status');status.textContent='Cargando destacados…';container.before(status);

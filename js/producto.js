@@ -1,6 +1,6 @@
-import {catalogApi} from './catalog-api.js';
-import {escapeHTML,productSizes,sizeUnavailable,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js';
-import {getProductImages,createProductCard} from './product-ui.js';
+import {catalogApi} from './catalog-api.js?v=supabase-2';
+import {escapeHTML,productSizes,sizeUnavailable,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=supabase-2';
+import {getProductImages,createProductCard} from './product-ui.js?v=supabase-2';
 let products=[],product;
 const productDetail =
     document.querySelector("#product-detail");

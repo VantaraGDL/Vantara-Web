@@ -1,4 +1,4 @@
-import {escapeHTML,knownPrice} from './catalog-logic.js';
+import {escapeHTML,knownPrice} from './catalog-logic.js?v=supabase-2';
 export function getProductImages(product) {
 
     if (
