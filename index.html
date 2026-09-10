@@ -11,11 +11,11 @@
     <title>Vant'ara</title>
     <meta name="description" content="Descubre el catálogo de Vant'ara: streetwear, ropa y accesorios seleccionados en Guadalajara, México.">
 
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/global.css?v=editorial-1">
+    <link rel="stylesheet" href="css/home.css?v=editorial-1">
 </head>
 
-<body>
+<body class="home-page">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
 <header class="navbar">
@@ -26,7 +26,7 @@
 
 
     <nav class="nav-links" aria-label="Principal">
-        <a href="index.html">Inicio</a>
+        <a href="index.html" aria-current="page">Inicio</a>
         <a href="catalogo.html">Catálogo</a>
         <a href="nosotros.html">Nosotros</a>
         <a href="contacto.html">Contacto</a>
@@ -72,7 +72,7 @@
 
     <nav class="mobile-menu-links" aria-label="Principal móvil">
 
-        <a href="index.html">
+        <a href="index.html" aria-current="page">
             Inicio
         </a>
 
@@ -108,15 +108,15 @@
 
     <main id="contenido" tabindex="-1">
 
-        <section class="hero">
+        <section class="hero" aria-labelledby="hero-title">
 
             <div class="hero-content">
                 <p class="hero-label">
                     NUEVO DROP
                 </p>
 
-                <h1>
-                    Streetwear & Accessories
+                <h1 id="hero-title">
+                    Streetwear <span>& Accessories</span>
                 </h1>
 
                 <p>
@@ -133,6 +133,23 @@
 
         </section>
 
+
+        <section class="home-benefits" aria-label="Sobre nuestra selección y servicio">
+            <ul>
+                <li>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg>
+                    <div><h2>Piezas seleccionadas</h2><p>Streetwear, ropa y accesorios.</p></div>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h11v12H3V6Zm11 5h4l3 4v3h-7M6 6v4h5V6"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>
+                    <div><h2>Envíos a México</h2><p>Costos y tiempos confirmados antes de cada pedido.</p></div>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 4h16v12H9l-5 4V4Zm4 5h8M8 12h5"/></svg>
+                    <div><h2>Consulta tu pieza</h2><p>Información sobre tallas y disponibilidad.</p></div>
+                </li>
+            </ul>
+        </section>
 
         <section class="featured">
 
