@@ -1,3 +1,4 @@
+import {mountMedia} from './media.js';
 import {projectUrl,publishableKey} from './config.js';
 import {requireAdmin} from './auth.js';
 import {pending,filterProducts,numberOrNull,allRows,saveChanges} from './products-data.js';
@@ -31,18 +32,19 @@ async function boot(){
    options(form.elements.brand_id,brands);options(form.elements.category_id,categories);options(form.elements.collection_id,collections,'Sin colección');
    const fields=['name','model','color','brand_id','category_id','price','material','description','collection_id'];
    for(const key of fields)form.elements[key].value=original[key]??'';
-   for(const key of ['featured','published'])form.elements[key].checked=original[key];
+   for(const key of ['featured'])form.elements[key].checked=original[key];
    for(const v of original.product_variants.sort((a,b)=>a.position-b.position)){const label=node('label',v.size);label.htmlFor='stock-'+v.id;const input=document.createElement('input');Object.assign(input,{id:label.htmlFor,type:'number',min:'0',max:'2147483647',step:'1',value:v.stock??'',placeholder:'Pendiente'});input.dataset.variant=v.id;$('#variants').append(label,input);}
-   form.addEventListener('input',()=>{dirty=true;});form.hidden=false;
+   form.addEventListener('input',()=>{dirty=true;});form.hidden=false;form.querySelector('fieldset').disabled=original.deletion_pending;
    form.addEventListener('submit',async e=>{e.preventDefault();if(saving)return;try{
     const patch={};for(const key of fields)patch[key]=form.elements[key].value.trim()||null;
     if(!patch.name)throw new Error('El nombre es obligatorio.');patch.price=numberOrNull(form.elements.price.value);
-    patch.featured=form.elements.featured.checked;patch.published=form.elements.published.checked;
+    patch.featured=form.elements.featured.checked;
     const variants=[...form.querySelectorAll('[data-variant]')].map(i=>({id:Number(i.dataset.variant),stock:numberOrNull(i.value,true)}));
     saving=true;form.querySelector('fieldset').disabled=true;form.setAttribute('aria-busy','true');say('Guardando…');
     if(!await requireAdmin(client))throw new Error('Sesión vencida. Inicia sesión antes de guardar.');
     await saveChanges(client,original,patch,variants);dirty=false;say('Cambios guardados correctamente.');
-   }catch(e){say(e.message);}finally{saving=false;form.querySelector('fieldset').disabled=false;form.removeAttribute('aria-busy');}});say('');
+   }catch(e){say(e.message);}finally{saving=false;form.querySelector('fieldset').disabled=original.deletion_pending;form.removeAttribute('aria-busy');}});say('');
+   await mountMedia(client,original,{busy:()=>saving,lock:value=>{saving=value;document.querySelectorAll('#content fieldset').forEach(f=>f.disabled=value);form.querySelector('fieldset').disabled=value||original.deletion_pending;},deleted:()=>{dirty=false;saving=false;}});
   }
  }catch(e){content.hidden=true;say(e.message || 'No se pudo cargar la página. Comprueba la conexión y recarga.');}
 }
