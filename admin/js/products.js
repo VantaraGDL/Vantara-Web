@@ -1,5 +1,6 @@
-import {mountVariants} from './variant-editor.js?v=admin-4';
-import {mountMedia} from './media.js';
+import {loadSizes} from './sizes.js?v=admin-5';
+import {mountVariants} from './variant-editor.js?v=admin-5';
+import {mountMedia} from './media.js?v=admin-5';
 import {projectUrl,publishableKey} from './config.js';
 import {requireAdmin} from './auth.js';
 import {pending,filterProducts,numberOrNull,allRows,saveChanges} from './products-data.js?v=admin-4';
@@ -34,7 +35,8 @@ async function boot(){
    const fields=['name','model','color','brand_id','category_id','price','material','description','collection_id'];
    for(const key of fields)form.elements[key].value=original[key]??'';
    for(const key of ['featured','new_release'])form.elements[key].checked=original[key];
-   const variantEditor=mountVariants($('#variants'),original,{busy:()=>saving,changed:()=>{dirty=true;say('Cambios pendientes de guardar.');}});
+   const sizes=await loadSizes(client);
+   const variantEditor=mountVariants($('#variants'),original,{busy:()=>saving,changed:()=>{dirty=true;say('Cambios pendientes de guardar.');}},sizes);
    form.addEventListener('input',()=>{dirty=true;});form.hidden=false;form.querySelector('fieldset').disabled=original.deletion_pending;
    form.addEventListener('submit',async e=>{e.preventDefault();if(saving)return;try{
     const patch={};for(const key of fields)patch[key]=form.elements[key].value.trim()||null;

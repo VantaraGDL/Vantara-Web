@@ -1,4 +1,4 @@
-import {SIZES,sizeLabel} from './sizes.js?v=admin-4';
+import {loadSizes} from './sizes.js?v=admin-5';
 import {mountTaxonomyCreation} from './taxonomy-create.js?v=admin-3';
 import {projectUrl,publishableKey} from './config.js';
 import {requireAdmin} from './auth.js';
@@ -20,6 +20,7 @@ async function boot(){try{
  options('brand_id',brands,'Selecciona marca');options('category_id',categories,'Selecciona categoría');options('collection_id',collections,'Sin colección');
  form.elements.brand_id.required=true;form.elements.category_id.required=true;
  mountTaxonomyCreation(client,form,{busy:()=>busy,lock:value=>{busy=value;form.querySelector('fieldset').disabled=value;},changed:()=>dirty=true,say});
+ const {options:SIZES,sizeLabel}=await loadSizes(client);
  const values=new Map(),chosen=new Set();
  function variants(){const box=document.querySelector('#variants');box.replaceChildren();
   const sizes=SIZES.map(([size])=>size);

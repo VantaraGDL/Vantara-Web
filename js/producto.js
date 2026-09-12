@@ -1,3 +1,4 @@
+import {createOrderConfirmation} from './order-confirmation.js?v=whatsapp-1';
 import {catalogApi} from './catalog-api.js?v=supabase-2';
 import {escapeHTML,productSizes,sizeUnavailable,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=supabase-2';
 import {getProductImages,createProductCard} from './product-ui.js?v=supabase-2';
@@ -280,6 +281,7 @@ function setupSizeButtons() {
 }
 
 function setupContactButton() {
+    const openConfirmation = createOrderConfirmation(money);
     document.querySelector('#contact-button').addEventListener('click', () => {
         const selected = products.filter(p => orderSelection.has(p.id));
         const error = document.querySelector('#order-error');
@@ -302,15 +304,11 @@ function setupContactButton() {
                 error.textContent = `${item.name || item.model} está agotado.`; return;
             }
         }
-        const lines = selected.map(item => {
+        const rows = selected.map(item => {
             const { size, quantity } = orderSelection.get(item.id);
-            return `${item.name || item.model}${size ? ' — Talla ' + size : ''} — ${quantity} pieza(s) — ${knownPrice(item) ? money(item.price).replace(' MXN', '') : 'Precio por confirmar'}`;
+            return {name: item.name || item.model, size: size || item.variants?.[0]?.size || 'No requiere talla', quantity, price: knownPrice(item) ? item.price : null};
         });
-        const calculation = calculateOrder(selected);
-        const total = calculation.completePrice ? money(calculation.total) : 'Por confirmar';
-        const message = `Hola, me interesan las siguientes prendas:\n${lines.join('\n')}\n\n${selected.length} producto(s), ${selected.reduce((sum, p) => sum + orderSelection.get(p.id).quantity, 0)} pieza(s)\n${calculation.discount ? 'Descuento por conjunto: −' + money(calculation.discount) + '\n' : ''}Total: ${total}`;
-        console.log(message);
-        alert(message);
+        openConfirmation(rows, calculateOrder(selected), document.querySelector('#contact-button'));
     });
 }
 

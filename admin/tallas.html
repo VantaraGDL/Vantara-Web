@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Tallas | Vant’ara Admin</title><link rel="stylesheet" href="./css/admin.css"></head>
+<body><main><header><h1>Gestionar tallas</h1><nav><a href="./index.html">Dashboard</a> · <a href="./productos.html">Productos</a></nav></header>
+<p id="message" role="status" aria-live="polite">Verificando acceso…</p><section id="content" hidden>
+<p>Desactivar una talla impide añadirla a productos. Las variantes existentes se conservan. El código no se cambia después de crearlo.</p>
+<form id="size-form"><fieldset><legend id="form-title">Crear talla</legend>
+<label for="code">Código</label><input id="code" required maxlength="40">
+<label for="label">Nombre</label><input id="label" required maxlength="120">
+<label for="sort">Orden</label><input id="sort" type="number" min="0" max="2147483647" step="1" required>
+<label class="check"><input id="active" type="checkbox" checked> Activa</label>
+<button type="submit">Guardar talla</button><button type="button" id="cancel">Cancelar edición</button>
+</fieldset></form><h2>Tallas actuales</h2><div id="sizes-list" class="product-list"></div></section>
+<noscript>Activa JavaScript para acceder.</noscript></main><script type="module" src="./js/sizes-admin.js?v=admin-5"></script></body></html>

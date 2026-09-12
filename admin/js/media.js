@@ -2,13 +2,14 @@ import {requireAdmin} from './auth.js';
 import {BUCKET,uploadImage,deleteImage,deleteProduct,mediaAction,objectPath} from './media-data.js';
 export async function mountMedia(client,product,controls) {
   const root=document.querySelector('#media-panel'),list=document.querySelector('#media-list'),status=document.querySelector('#media-status');
-  let images=[],ordered=false,urls=[];
+  let images=[],ordered=false,urls=[],renderVersion=0,running=false;
   const node=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n;};
   const say=text=>{status.textContent=text;};
   window.addEventListener('beforeunload',e=>{if(ordered){e.preventDefault();e.returnValue='';}});
-  async function run(fn){if(controls.busy())return;controls.lock(true);root.setAttribute('aria-busy','true');try{if(!await requireAdmin(client))throw new Error('Sesión vencida. Vuelve a iniciar sesión.');await fn();}catch(e){say(e.message||'No se confirmó la operación. Recarga o reintenta.');}finally{controls.lock(false);root.removeAttribute('aria-busy');}}
+  async function run(fn){if(running||controls.busy())return;running=true;controls.lock(true);root.setAttribute('aria-busy','true');try{if(!await requireAdmin(client))throw new Error('Sesión vencida. Vuelve a iniciar sesión.');await fn();}catch(e){say(e.message||'No se confirmó la operación. Recarga o reintenta.');}finally{running=false;controls.lock(false);root.removeAttribute('aria-busy');}}
   function button(text,fn){const b=node('button',text);b.type='button';b.addEventListener('click',fn);return b;}
   async function render(){
+    const version=++renderVersion;
     urls.forEach(URL.revokeObjectURL);urls=[];list.replaceChildren();
     const main=images.find(i=>i.media_state==='ready')?.id;
     for(const [index,image] of images.entries()){
@@ -16,7 +17,13 @@ export async function mountMedia(client,product,controls) {
       card.append(node('h3',image.id===main?'Principal':`Imagen ${index+1}`));
       const pic=document.createElement('img');pic.alt=image.alt||product.name;pic.loading='lazy';card.append(pic);
       if(image.bucket_id && image.media_state!=='deleting'){
-        try{const path=objectPath(image,product.id);const r=await client.storage.from(BUCKET).download(path);if(!r.error){const url=URL.createObjectURL(r.data);urls.push(url);pic.src=url;}else pic.hidden=true;}catch{pic.hidden=true;}
+        // Previews must never block rendering or hold the mutation lock.
+        void (async()=>{try{
+          const path=objectPath(image,product.id),r=await client.storage.from(BUCKET).download(path);
+          if(version!==renderVersion||!pic.isConnected)return;
+          if(r.error){pic.hidden=true;return;}
+          const url=URL.createObjectURL(r.data);urls.push(url);pic.src=url;
+        }catch{if(version===renderVersion)pic.hidden=true;}})();
       }else if(!image.bucket_id && /^assets\/img\/[a-zA-Z0-9_./-]+$/.test(image.path) && !image.path.includes('..'))pic.src='../'+image.path;
       else pic.hidden=true;
       card.append(node('p',image.media_state==='uploading'?'Subida pendiente':image.media_state==='deleting'?'Eliminación pendiente':image.bucket_id?'Imagen en Storage':'Imagen del repositorio (solo se elimina su referencia)'));
@@ -26,15 +33,28 @@ export async function mountMedia(client,product,controls) {
       const up=button('↑ Subir',()=>move(index-1));up.disabled=index===0||product.deletion_pending;actions.append(up);
       const down=button('↓ Bajar',()=>move(index+1));down.disabled=index===images.length-1||product.deletion_pending;actions.append(down);
       if(image.media_state==='uploading')actions.append(button('Completar subida',()=>run(async()=>{if(ordered)throw new Error('Guarda el orden antes de completar una subida.');await mediaAction(client,product.id,'complete',{image_id:image.id});await refresh();say('Subida completada.');})));
-      actions.append(button(image.media_state==='deleting'?'Reintentar eliminación':'Eliminar imagen',()=>{
+      const remove=button(image.media_state==='deleting'?'Reintentar eliminación':'Eliminar imagen',async()=>{
+        if(running||controls.busy())return;
         if(ordered){say('Guarda el orden antes de eliminar una imagen.');return;}
         if(!confirm('¿Eliminar esta imagen? No se puede deshacer. Los archivos del repositorio no se borran.'))return;
-        run(async()=>{say('Eliminando imagen…');try{await deleteImage(client,product.id,image);}catch(error){try{await refresh();}catch{}throw error;}await refresh();say('Imagen eliminada.');});
-      }));card.append(actions);list.append(card);
+        await run(async()=>{
+          remove.disabled=true;remove.textContent='Eliminando…';say('Eliminando imagen…');
+          try{
+            await deleteImage(client,product.id,image);
+            // Both DB/Storage steps confirmed: remove locally without waiting for previews or another read.
+            images=images.filter(row=>row.id!==image.id);
+            await render();say('Imagen eliminada.');
+          }catch(error){
+            // The server may have reached a pending state, or committed before a network error.
+            try{await refresh();}catch{remove.disabled=false;remove.textContent='Reintentar eliminación';}
+            throw error;
+          }finally{remove.disabled=false;if(remove.isConnected)remove.textContent='Reintentar eliminación';}
+        });
+      });actions.append(remove);card.append(actions);list.append(card);
     }
     if(!images.length)list.append(node('p','Este producto no tiene imágenes.'));
   }
-  async function refresh(){const r=await client.from('product_images').select('*').eq('product_id',product.id).order('position');if(r.error)throw new Error('No se pudieron cargar las imágenes.');images=r.data;ordered=false;await render();}
+  async function refresh(){const r=await client.from('product_images').select('*').eq('product_id',product.id).order('position').order('id');if(r.error)throw new Error('No se pudieron cargar las imágenes.');images=r.data;ordered=false;await render();}
   document.querySelector('#upload-images').addEventListener('click',()=>run(async()=>{
     if(ordered)throw new Error('Guarda el orden antes de subir imágenes.');
     const input=document.querySelector('#image-files'),files=[...input.files];if(!files.length)throw new Error('Selecciona una o varias imágenes.');

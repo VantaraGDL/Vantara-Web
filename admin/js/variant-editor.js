@@ -1,6 +1,7 @@
-import {availableSizes,sortSizes,sizeLabel} from './sizes.js?v=admin-4';
 
-export function mountVariants(container,original,{busy,changed}) {
+
+export function mountVariants(container,original,{busy,changed},sizes) {
+    const {availableSizes,sortSizes,sizeLabel}=sizes;
     let rows=[];
     const label=document.createElement('label');label.textContent='Añadir talla';label.htmlFor='add-size';
     const select=document.createElement('select');select.id='add-size';
