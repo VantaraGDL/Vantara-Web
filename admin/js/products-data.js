@@ -17,14 +17,23 @@ export async function allRows(client, table, columns) {
 }
 // Una RPC: el servidor confirma todos los cambios o revierte la operación.
 export async function saveChanges(client, original, patch, variants) {
+  if(original.saveNeedsReload)throw new Error('El guardado anterior se confirmó, pero falta actualizar las tallas. Recarga la página antes de guardar otra vez.');
   const changes=Object.fromEntries(Object.entries(patch).filter(([k,v])=>original[k]!==v));
-  const stocks=variants.filter(v=>original.product_variants.find(x=>x.id===v.id)?.stock!==v.stock);
+  const stocks=variants.filter(v=>v.delete || !v.id || original.product_variants.find(x=>x.id===v.id)?.stock!==v.stock);
   if(!Object.keys(changes).length && !stocks.length)return 0;
   let result;
   try { result=await client.rpc('update_catalog_product',{p_product_id:original.id,p_changes:changes,p_variants:stocks}); }
   catch { throw new Error('No se pudo confirmar el guardado. Tus cambios siguen en el formulario; comprueba la conexión y reintenta.'); }
   if(result.error)throw new Error('No se pudo guardar el producto y sus tallas. Revisa los valores y tu acceso. Tus cambios siguen en el formulario.');
   Object.assign(original,changes);
-  for(const v of stocks)original.product_variants.find(x=>x.id===v.id).stock=v.stock;
+  if(stocks.some(v=>v.delete || !v.id)) {
+    // Read assigned IDs only after the transaction succeeds. Never insert variants separately.
+    original.saveNeedsReload=true;
+    try {
+      const result=await client.from('product_variants').select('id,size,stock,position').eq('product_id',original.id).order('position');
+      if(result.error)throw result.error;
+      original.product_variants=result.data;original.saveNeedsReload=false;
+    }catch{throw new Error('Producto y tallas guardados. No pudimos recargar sus identificadores; recarga la página antes de seguir editando.');}
+  } else for(const v of stocks)original.product_variants.find(x=>x.id===v.id).stock=v.stock;
   return 1;
 }

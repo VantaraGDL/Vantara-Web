@@ -1,7 +1,8 @@
+import {mountVariants} from './variant-editor.js?v=admin-4';
 import {mountMedia} from './media.js';
 import {projectUrl,publishableKey} from './config.js';
 import {requireAdmin} from './auth.js';
-import {pending,filterProducts,numberOrNull,allRows,saveChanges} from './products-data.js';
+import {pending,filterProducts,numberOrNull,allRows,saveChanges} from './products-data.js?v=admin-4';
 const $=s=>document.querySelector(s), content=$('#content'), message=$('#message');
 let dirty=false, saving=false;
 const say=t=>message.textContent=t;
@@ -32,17 +33,19 @@ async function boot(){
    options(form.elements.brand_id,brands);options(form.elements.category_id,categories);options(form.elements.collection_id,collections,'Sin colección');
    const fields=['name','model','color','brand_id','category_id','price','material','description','collection_id'];
    for(const key of fields)form.elements[key].value=original[key]??'';
-   for(const key of ['featured'])form.elements[key].checked=original[key];
-   for(const v of original.product_variants.sort((a,b)=>a.position-b.position)){const label=node('label',v.size);label.htmlFor='stock-'+v.id;const input=document.createElement('input');Object.assign(input,{id:label.htmlFor,type:'number',min:'0',max:'2147483647',step:'1',value:v.stock??'',placeholder:'Pendiente'});input.dataset.variant=v.id;$('#variants').append(label,input);}
+   for(const key of ['featured','new_release'])form.elements[key].checked=original[key];
+   const variantEditor=mountVariants($('#variants'),original,{busy:()=>saving,changed:()=>{dirty=true;say('Cambios pendientes de guardar.');}});
    form.addEventListener('input',()=>{dirty=true;});form.hidden=false;form.querySelector('fieldset').disabled=original.deletion_pending;
    form.addEventListener('submit',async e=>{e.preventDefault();if(saving)return;try{
     const patch={};for(const key of fields)patch[key]=form.elements[key].value.trim()||null;
     if(!patch.name)throw new Error('El nombre es obligatorio.');patch.price=numberOrNull(form.elements.price.value);
-    patch.featured=form.elements.featured.checked;
-    const variants=[...form.querySelectorAll('[data-variant]')].map(i=>({id:Number(i.dataset.variant),stock:numberOrNull(i.value,true)}));
+    patch.featured=form.elements.featured.checked;patch.new_release=form.elements.new_release.checked;
+    const rows=variantEditor.values();
+    if(!rows.some(v=>!v.removed))throw new Error('Conserva al menos una talla.');
+    const variants=rows.map(v=>v.removed?{id:v.id,delete:true}:{...(v.id?{id:v.id}:{size:v.size}),stock:numberOrNull(String(v.value),true)});
     saving=true;form.querySelector('fieldset').disabled=true;form.setAttribute('aria-busy','true');say('Guardando…');
     if(!await requireAdmin(client))throw new Error('Sesión vencida. Inicia sesión antes de guardar.');
-    await saveChanges(client,original,patch,variants);dirty=false;say('Cambios guardados correctamente.');
+    await saveChanges(client,original,patch,variants);dirty=false;variantEditor.reset();say('Cambios guardados correctamente.');
    }catch(e){say(e.message);}finally{saving=false;form.querySelector('fieldset').disabled=original.deletion_pending;form.removeAttribute('aria-busy');}});say('');
    await mountMedia(client,original,{busy:()=>saving,lock:value=>{saving=value;document.querySelectorAll('#content fieldset').forEach(f=>f.disabled=value);form.querySelector('fieldset').disabled=value||original.deletion_pending;},deleted:()=>{dirty=false;saving=false;}});
   }

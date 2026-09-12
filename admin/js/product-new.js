@@ -1,6 +1,8 @@
+import {SIZES,sizeLabel} from './sizes.js?v=admin-4';
+import {mountTaxonomyCreation} from './taxonomy-create.js?v=admin-3';
 import {projectUrl,publishableKey} from './config.js';
 import {requireAdmin} from './auth.js';
-import {allRows,numberOrNull} from './products-data.js';
+import {allRows,numberOrNull} from './products-data.js?v=admin-4';
 const form=document.querySelector('#creator'),content=document.querySelector('#content'),message=document.querySelector('#message');
 let dirty=false,busy=false;
 window.addEventListener('beforeunload',e=>{if(dirty||busy){e.preventDefault();e.returnValue='';}});
@@ -17,16 +19,17 @@ async function boot(){try{
  const [brands,categories,collections]=await Promise.all(['brands','categories','collections'].map(t=>allRows(client,t,'id,name')));
  options('brand_id',brands,'Selecciona marca');options('category_id',categories,'Selecciona categoría');options('collection_id',collections,'Sin colección');
  form.elements.brand_id.required=true;form.elements.category_id.required=true;
+ mountTaxonomyCreation(client,form,{busy:()=>busy,lock:value=>{busy=value;form.querySelector('fieldset').disabled=value;},changed:()=>dirty=true,say});
  const values=new Map(),chosen=new Set();
- function variants(){const box=document.querySelector('#variants');box.replaceChildren();if(!form.elements.category_id.value)return;
-  const sizes=form.elements.category_id.value==='Accessories'?['Única']:['S','M','L','XL'];
-  for(const size of sizes){const label=document.createElement('label');label.className='check';const check=document.createElement('input');check.type='checkbox';check.checked=size==='Única'||chosen.has(size);check.dataset.size=size;label.append(check,document.createTextNode(size));const input=document.createElement('input');input.type='number';input.min='0';input.max='2147483647';input.step='1';input.placeholder='Pendiente';input.value=values.get(size)??'';input.setAttribute('aria-label','Stock '+size);input.disabled=!check.checked;check.addEventListener('change',()=>{input.disabled=!check.checked;check.checked?chosen.add(size):chosen.delete(size);});input.addEventListener('input',()=>values.set(size,input.value));input.dataset.stock=size;box.append(label,input);}
+ function variants(){const box=document.querySelector('#variants');box.replaceChildren();
+  const sizes=SIZES.map(([size])=>size);
+  for(const size of sizes){const label=document.createElement('label');label.className='check';const check=document.createElement('input');check.type='checkbox';check.checked=chosen.has(size);check.dataset.size=size;label.append(check,document.createTextNode(sizeLabel(size)));const input=document.createElement('input');input.type='number';input.min='0';input.max='2147483647';input.step='1';input.placeholder='Pendiente';input.value=values.get(size)??'';input.setAttribute('aria-label','Stock '+size);input.disabled=!check.checked;check.addEventListener('change',()=>{input.disabled=!check.checked;if(check.checked)chosen.add(size);else chosen.delete(size);variants();[...box.querySelectorAll('[data-size]')].find(c=>c.dataset.size===size)?.focus();});input.addEventListener('input',()=>values.set(size,input.value));input.dataset.stock=size;box.append(label,input);}
  }
- form.elements.category_id.addEventListener('change',variants);
+
  form.addEventListener('input',()=>dirty=true);variants();form.hidden=false;say('');
  form.addEventListener('submit',async e=>{e.preventDefault();if(busy)return;
   try{const product={};for(const key of ['name','model','color','brand_id','category_id','material','description','collection_id'])product[key]=form.elements[key].value.trim()||null;
-   if(!product.name||!product.brand_id||!product.category_id)throw new Error('Completa nombre, marca y categoría.');product.price=numberOrNull(form.elements.price.value);product.featured=form.elements.featured.checked;
+   if(!product.name||!product.brand_id||!product.category_id)throw new Error('Completa nombre, marca y categoría.');product.price=numberOrNull(form.elements.price.value);product.featured=form.elements.featured.checked;product.new_release=form.elements.new_release.checked;
    const variants=[...form.querySelectorAll('[data-size]:checked')].map(c=>({size:c.dataset.size,stock:numberOrNull([...form.querySelectorAll('[data-stock]')].find(i=>i.dataset.stock===c.dataset.size).value,true)}));
    if(!variants.length)throw new Error('Selecciona al menos una talla.');
    busy=true;form.querySelector('fieldset').disabled=true;form.setAttribute('aria-busy','true');say('Creando producto…');
