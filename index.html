@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/global.css?v=editorial-1">
     <link rel="stylesheet" href="css/home.css?v=editorial-2">
     <link rel="stylesheet" href="css/public-theme.css?v=public-1">
+    <link rel="stylesheet" href="css/new-releases.css?v=releases-2">
 </head>
 
 <body class="public-page home-page">
@@ -96,15 +97,16 @@
             </ul>
         </section>
 
-        <section class="featured" aria-labelledby="featured-title">
+        <section class="featured without-releases" aria-labelledby="featured-title">
             <div class="featured-catalog">
                 <div class="section-header"><h2 id="featured-title">Productos destacados</h2><a href="catalogo.html">Ver todo <span aria-hidden="true">→</span></a></div>
                 <div id="featured-products" class="product-grid"></div>
             </div>
-            <a class="editorial-banner" href="catalogo.html?category=Accessories">
-                <div><p class="editorial-kicker">DETALLES<br>QUE HABLAN</p><span class="gold-rule"></span><p>ACCESORIOS<br>ROPA<br>Y MÁS</p></div>
-                <span class="banner-caption">ESTILO EN CADA ELECCIÓN <span aria-hidden="true">→</span></span>
-            </a>
+            <section id="new-releases" class="new-releases" aria-labelledby="releases-title" aria-roledescription="carrusel" hidden>
+                <h2 id="releases-title">Nuevos lanzamientos</h2>
+                <div class="release-stage"></div>
+                <div class="release-controls" role="group" aria-label="Elegir lanzamiento" hidden></div>
+            </section>
         </section>
         <section class="home-discovery" aria-label="Explora Vant’ara">
             <div class="look-panel" id="look-panel">
@@ -192,7 +194,7 @@
 </div>
 
 
-    <script type="module" src="js/home.js?v=supabase-2"></script>
+    <script type="module" src="js/home.js?v=releases-2"></script>
     <script src="js/menu.js"></script>
 
 </body>

@@ -1,0 +1,15 @@
+.home-page .featured.without-releases{grid-template-columns:minmax(0,1fr)}
+.new-releases{min-width:0;overflow:hidden;position:relative;background:var(--color-night);border:var(--border-subtle);border-radius:9px;display:flex;flex-direction:column}
+.new-releases>h2{font:1.35rem/1.2 Georgia,serif;color:var(--color-ivory);padding:18px 20px}
+.release-stage{display:grid;flex:1;min-width:0}.release-slide{grid-area:1/1;position:relative;min-height:300px;display:flex;align-items:flex-end;isolation:isolate;overflow:hidden;animation:release-enter .4s ease}
+.release-slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}.release-slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,13,20,.1),rgba(8,13,20,.94));z-index:-1}
+.release-copy{padding:24px 20px;min-width:0}.release-label{color:var(--color-gold);font-size:.65rem;letter-spacing:.15em;margin-bottom:16px}.release-brand{color:var(--color-silver);font-size:.8rem;margin-bottom:8px}.release-name{color:var(--color-ivory);font:clamp(1.2rem,2vw,1.8rem)/1.2 Georgia,serif;overflow-wrap:anywhere}.release-cta{display:block;color:var(--color-ivory);font-size:.7rem;letter-spacing:.12em;margin-top:22px}
+.release-controls{position:absolute;z-index:2;bottom:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:0;max-width:calc(100% - 32px);overflow-x:auto;padding:2px 6px;border:0;background:rgb(8 13 20 / 30%);border-radius:20px;box-shadow:0 2px 8px rgb(0 0 0 / 15%)}
+.has-release-dots .release-copy{padding-bottom:66px}
+.release-controls .release-dot{display:grid;place-items:center;flex-shrink:0;width:24px;height:24px;min-width:24px;min-height:24px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer}
+.release-dot::before{content:"";width:8px;height:8px;border-radius:50%;background:#344454;border:1px solid #526171;transition:background .18s ease,transform .18s ease}
+.release-dot[aria-current="true"]::before{background:var(--color-ivory);border-color:var(--color-gold);transform:scale(1.15)}
+.new-releases :focus-visible{outline:2px solid var(--color-gold);outline-offset:-3px}
+@keyframes release-enter{from{opacity:.4}to{opacity:1}}
+@media(max-width:650px){.release-slide{min-height:260px}.release-copy{padding:20px}.release-name{font-size:1.5rem}}
+@media(prefers-reduced-motion:reduce){.release-slide{animation:none}.release-dot::before{transition:none}}

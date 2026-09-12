@@ -1,7 +1,7 @@
 import {projectUrl, publishableKey} from '../admin/js/config.js?v=supabase-2';
 
 // Public requests deliberately never read the admin session or send its JWT.
-export const PRODUCT_SELECT = 'id,name,model,color,material,finish,description,price,featured,published,position,requires_size,max_quantity,brands(id,name),categories(id,name),collections(id,name,discount_enabled,discount_amount,minimum_pieces),product_variants(id,size,stock,position),product_images(id,path,alt,position,bucket_id,media_state)';
+export const PRODUCT_SELECT = 'id,name,model,color,material,finish,description,price,featured,new_release,created_at,published,position,requires_size,max_quantity,brands(id,name),categories(id,name),collections(id,name,discount_enabled,discount_amount,minimum_pieces),product_variants(id,size,stock,position),product_images(id,path,alt,position,bucket_id,media_state)';
 const placeholder = 'assets/img/producto-pendiente.svg';
 const byPosition = (a,b) => a.position-b.position || a.id-b.id;
 
@@ -11,6 +11,7 @@ export function transformProduct(row) {
         id: Number(row.id), name: row.name, model: row.model, color: row.color,
         material: row.material, finish: row.finish, description: row.description,
         price: row.price === null ? null : Number(row.price), featured: row.featured === true,
+        newRelease: row.new_release === true, published: row.published === true, createdAt: row.created_at,
         brand: row.brands?.name || '', category: row.categories?.id || '',
         categoryName: row.categories?.name || '', position: row.position,
         collection: row.collections?.id || null, collectionName: row.collections?.name || '',
