@@ -1,4 +1,4 @@
-import {createOrderConfirmation} from './order-confirmation.js?v=whatsapp-1';
+import {createOrderConfirmation} from './order-confirmation.js?v=whatsapp-2';
 import {catalogApi} from './catalog-api.js?v=supabase-2';
 import {escapeHTML,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=supabase-2';
 import {getProductImages,createProductCard} from './product-ui.js?v=supabase-2';

@@ -1,4 +1,4 @@
-const WHATSAPP_NUMBER = '523314864527';
+const WHATSAPP_NUMBER = '523315012267';
 
 export function buildOrderMessage(rows, calculation, money) {
     const lines = rows.map(row => `${row.name}\nTalla: ${row.size}\nCantidad: ${row.quantity}\nPrecio unitario: ${row.price === null ? 'Por confirmar' : money(row.price)}`);
