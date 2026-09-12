@@ -194,3 +194,66 @@ body.public-page { font-size: var(--font-body); }
  .public-page .hero-signature { max-width: 88%; flex-wrap: wrap; gap: 10px; }
  .public-page .catalog-tools { min-width: 0; }
 }
+
+/* Responsive refinement shared by public pages only. */
+.public-page{--layout-gap:clamp(12px,1.5vw,24px);--touch-size:44px;--font-body:clamp(1.0625rem,1vw,1.1875rem)}
+.public-page :is(.catalog-tools,.product-info,.product-data,.order-panel,.about-block>div,.contact-card>div){min-width:0}
+.public-page :is(.product-info,.outfit-info,.order-panel,.about-block,.contact-info){overflow-wrap:anywhere}
+.public-page .product-card>a{display:flex;flex-direction:column;height:100%}
+.public-page .product-info{display:flex;flex-direction:column;flex:1}
+.public-page .product-info h3{margin-bottom:10px}
+.public-page .product-price{margin-top:auto;padding-top:4px}
+.public-page .product-image{flex-shrink:0}
+.public-page :is(.catalog>.product-grid,.related-products,.related-section>.product-grid){grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:var(--layout-gap)}
+.public-page .catalog>.product-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))}
+.public-page :is(.button,.product-action,.confirmation-actions button){white-space:normal;overflow-wrap:anywhere;line-height:1.4;min-height:var(--touch-size)}
+.public-page .size-button{min-width:44px;min-height:44px;max-width:100%;overflow-wrap:anywhere}
+.public-page .quantity-control button{width:44px;height:44px;flex-shrink:0}
+.public-page .quantity-control input{min-height:44px;width:36px}
+.public-page .outfit-info .size-button{min-width:44px;min-height:44px}
+.public-page .public-footer nav a{display:inline-flex;align-items:center;min-height:44px}
+.public-page .public-footer :is(p,nav,small){min-width:0;overflow-wrap:anywhere}
+.public-page .contact-card h2{font-size:clamp(21px,2.5vw,38px);word-break:normal;overflow-wrap:normal}
+.public-page .contact-card{flex-wrap:wrap}
+.public-page .contact-card>span{flex-shrink:0}
+.public-page .low-stock-note{line-height:1.6}
+@media(min-width:651px) and (max-width:950px){
+ .public-page .navbar{grid-template-columns:1fr auto;gap:8px 16px;padding-top:14px}
+ .public-page .navbar .nav-links{grid-column:1/-1;grid-row:2;justify-content:center;flex-wrap:wrap;gap:12px 24px}
+ .public-page .nav-links a{padding:14px 0}
+ .public-page .nav-links a[aria-current="page"]::after{bottom:6px}
+ .public-page .header-tools{grid-column:2;grid-row:1}
+}
+@media(max-width:850px){
+ .public-page .product-detail{grid-template-columns:minmax(0,1fr)}
+ .public-page .product-gallery{position:static;display:flex;flex-direction:column;align-items:center}
+ .public-page .product-main-image{height:min(48svh,440px);max-width:440px}
+ .public-page .product-thumbnails{width:100%;display:flex;flex-direction:row;flex-wrap:nowrap;gap:8px;padding:4px}
+ .public-page .order-panel{grid-column:1;position:static}
+ .public-page .about-block{padding:clamp(20px,4vw,32px)}
+}
+@media(max-width:650px){
+ .public-page .header-tools a{width:44px}
+ .public-page .mobile-menu{height:100dvh;overflow-y:auto;overscroll-behavior:contain}
+ .public-page .mobile-menu-links a{font-size:clamp(24px,7vw,36px);min-height:44px}
+ .public-page .catalog>.product-grid,.public-page .related-section>.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .public-page .product-main-image{height:min(42svh,350px)}
+ .public-page .outfit-card,.public-page .outfit-card:has(input:checked){display:flex;flex-direction:column}
+ .public-page .outfit-card:has(input:checked) .outfit-info{display:block}
+ .public-page .outfit-card>img{align-self:flex-start}
+ .public-page .outfit-info{width:100%}
+ .public-page .outfit-list{scroll-padding-inline:2px}
+ .public-page .contact-card{padding:20px;gap:12px}
+}
+@media(max-width:359px){
+ .public-page .catalog>.product-grid,.public-page .related-section>.product-grid{grid-template-columns:minmax(0,1fr)}
+ .public-page .catalog-tools{grid-template-columns:minmax(0,1fr)}
+ .public-page .catalog-tools>*{grid-column:1;grid-row:auto}
+ .public-page .contact-card{padding:16px}
+}
+@media(min-width:1800px){
+ .public-page .catalog>.product-grid,.public-page .related-section>.product-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+ .public-page .product-detail{max-width:2000px;margin-inline:auto;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(280px,.65fr)}
+ .public-page .product-main-image{max-width:520px;height:640px}
+ .public-page .nav-links a{font-size:1rem}
+}

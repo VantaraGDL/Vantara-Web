@@ -13,3 +13,5 @@
 @keyframes release-enter{from{opacity:.4}to{opacity:1}}
 @media(max-width:650px){.release-slide{min-height:260px}.release-copy{padding:20px}.release-name{font-size:1.5rem}}
 @media(prefers-reduced-motion:reduce){.release-slide{animation:none}.release-dot::before{transition:none}}
+
+@media(pointer:coarse){.release-controls .release-dot{width:32px;height:36px;min-width:32px;min-height:36px}.has-release-dots .release-copy{padding-bottom:78px}}

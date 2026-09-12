@@ -140,3 +140,29 @@
 .brand-explorer nav a:hover{border-color:var(--color-gold);background:#10202bba}
 @media(max-width:850px){.home-page .home-discovery{grid-template-columns:1fr}.brand-explorer{border-left:0;border-top:1px solid #293e4c;min-height:340px}.home-discovery .editorial-tiles a{aspect-ratio:1.7}}
 @media(max-width:380px){.home-discovery .editorial-tiles a{aspect-ratio:1;min-height:125px}}
+
+/* Home proportions across compact and very large screens. */
+.home-page .hero-content{max-width:780px}
+.home-page .hero h1{overflow-wrap:normal}
+.home-page .inspiration-copy{min-width:0}
+.home-page .brand-explorer h2{overflow-wrap:anywhere}
+@media(min-width:1800px){
+ .home-page .featured{grid-template-columns:minmax(0,1fr) minmax(320px,480px)}
+ .home-page .product-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+ .home-page .home-discovery .editorial-tiles{width:100%;max-width:760px;justify-self:center}
+ .home-page .brand-explorer nav{max-width:540px}
+}
+@media(min-width:651px) and (max-width:950px){
+ .home-page .hero-content{width:72%}
+ .home-page .hero-signature{right:3%;width:90px}
+}
+@media(max-width:650px){
+ .home-page .hero-content{width:100%}
+ .home-page .hero{min-height:420px;height:auto}
+ .home-page .hero h1{font-size:clamp(30px,8vw,48px)}
+ .home-page .home-benefits li{min-width:0}
+}
+@media(max-width:359px){
+ .home-page .featured .product-grid{grid-template-columns:minmax(0,1fr)}
+ .home-page .home-discovery .editorial-tiles a span{font-size:.75rem}
+}
