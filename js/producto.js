@@ -141,7 +141,7 @@ function renderProduct(product) {
 
                 <div class="product-option">
                     <p class="product-option-label">Talla</p>
-                    <div class="size-quantity-row"><div class="size-list" data-sizes-for="${product.id}">${sizesHTML || "No requiere talla"}</div>${renderQuantity(product)}</div>
+                    <div class="size-quantity-row"><div class="size-list" data-sizes-for="${product.id}">${sizesHTML || "Unitalla"}</div>${renderQuantity(product)}</div>
                     <p id="stock-status" class="stock-status" role="status" ${sizesHTML ? "" : "hidden"}>
                         Selecciona una talla
                     </p>
@@ -224,7 +224,7 @@ function renderCollection(current) {
                     <p>${knownPrice(item) ? money(item.price) : 'Precio por confirmar'}</p>
                     <fieldset data-sizes-for="${item.id}" hidden>
                         <legend>Talla — ${escapeHTML(item.name || item.model)}</legend>
-                        <div class="size-quantity-row"><div class="size-list">${createSizes(item) || 'No requiere talla'}</div>${renderQuantity(item)}</div>
+                        <div class="size-quantity-row"><div class="size-list">${createSizes(item) || 'Unitalla'}</div>${renderQuantity(item)}</div>
                     </fieldset>
                 </div>
             </article>`).join("")}</div>
