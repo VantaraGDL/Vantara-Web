@@ -1,4 +1,4 @@
-import {escapeHTML,knownPrice} from './catalog-logic.js?v=supabase-2';
+import {escapeHTML,knownPrice,getProductBadge} from './catalog-logic.js?v=badges-1';
 export function getProductImages(product) {
 
     if (
@@ -38,10 +38,12 @@ export function createProductCard(product) {
             ? images[1]
             : null;
 
+    const badge = getProductBadge(product);
     article.innerHTML = `
         <a href="producto.html?id=${product.id}">
 
             <div class="product-image">
+                ${badge ? `<span class="product-badge product-badge--${badge.kind}">${badge.label}</span>` : ''}
 
                 <img
                     class="

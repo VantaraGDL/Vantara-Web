@@ -296,3 +296,9 @@ body.public-page { font-size: var(--font-body); }
  .public-page .low-stock-note{translate:none}
  .public-page .order-confirmation[open],.public-page .order-confirmation[open]::backdrop{opacity:1}
 }
+
+/* Shared card status: one compact label, independent of image hover. */
+.public-page .product-image{position:relative}
+.public-page .product-badge{position:absolute;top:8px;left:8px;z-index:2;max-width:calc(100% - 16px);padding:5px 7px;border:1px solid #d6bc8799;border-radius:3px;background:#e6cea0;color:#17212a;font-size:clamp(.625rem,1.1vw,.75rem);font-weight:700;letter-spacing:.04em;line-height:1.3;pointer-events:none;overflow-wrap:anywhere}
+.public-page :is(.product-badge--new,.product-badge--low-stock,.product-badge--sold-out){background:transparent;color:#e6cea0;border-color:#d6bc87;text-shadow:0 1px 2px #071018,0 0 3px #071018;box-shadow:0 0 2px #07101880,inset 0 0 2px #07101880}
+.public-page .product-badge--sold-out{color:#d6dce1;border-color:#c5cdd4}

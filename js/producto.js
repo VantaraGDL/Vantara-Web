@@ -1,7 +1,7 @@
 import {createOrderConfirmation} from './order-confirmation.js?v=whatsapp-2';
 import {catalogApi} from './catalog-api.js?v=supabase-2';
-import {escapeHTML,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=supabase-2';
-import {getProductImages,createProductCard} from './product-ui.js?v=supabase-2';
+import {escapeHTML,getPublicVariants,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=badges-1';
+import {getProductImages,createProductCard} from './product-ui.js?v=badges-1';
 let products=[],product;
 const productDetail =
     document.querySelector("#product-detail");
@@ -52,8 +52,9 @@ async function loadProduct() {
 loadProduct();
 
 function initialSelection(item) {
-    const single = item.variants?.length === 1 ? item.variants[0] : null;
-    return {size: single?.size === 'Única' && single.stock !== 0 ? single.size : null, quantity: 1};
+    const variants = getPublicVariants(item);
+    const single = variants.length === 1 ? variants[0] : null;
+    return {size: single?.size === 'Única' && single.stock > 0 ? single.size : null, quantity: 1};
 }
 
 function renderProduct(product) {
@@ -141,7 +142,7 @@ function renderProduct(product) {
 
                 <div class="product-option">
                     <p class="product-option-label">Talla</p>
-                    <div class="size-quantity-row"><div class="size-list" data-sizes-for="${product.id}">${sizesHTML || "Unitalla"}</div>${renderQuantity(product)}</div>
+                    <div class="size-quantity-row"><div class="size-list" data-sizes-for="${product.id}">${sizesHTML}</div>${renderQuantity(product)}</div>
                     <p id="stock-status" class="stock-status" role="status" ${sizesHTML ? "" : "hidden"}>
                         Selecciona una talla
                     </p>
@@ -203,7 +204,7 @@ function money(value) {
 function createSizes(item) {
     return productSizes(item).map(size => `
         <button type="button" class="size-button" aria-pressed="false" data-size="${escapeHTML(size)}"
-            ${sizeUnavailable(item, size) ? 'disabled title="Talla agotada"' : ''}>${escapeHTML(size)}</button>
+            ${sizeUnavailable(item, size) ? 'disabled title="Talla agotada"' : ''}>${escapeHTML(size === 'Única' ? 'Unitalla' : size)}</button>
     `).join("");
 }
 
@@ -224,7 +225,7 @@ function renderCollection(current) {
                     <p>${knownPrice(item) ? money(item.price) : 'Precio por confirmar'}</p>
                     <fieldset data-sizes-for="${item.id}" hidden>
                         <legend>Talla — ${escapeHTML(item.name || item.model)}</legend>
-                        <div class="size-quantity-row"><div class="size-list">${createSizes(item) || 'Unitalla'}</div>${renderQuantity(item)}</div>
+                        <div class="size-quantity-row"><div class="size-list">${createSizes(item)}</div>${renderQuantity(item)}</div>
                     </fieldset>
                 </div>
             </article>`).join("")}</div>
@@ -299,6 +300,11 @@ function setupContactButton() {
         if (!selected.length) { error.textContent = 'Selecciona al menos una prenda.'; return; }
         for (const item of selected) {
             const { size, quantity } = orderSelection.get(item.id);
+            if (!getPublicVariants(item).some(v => v.size === size && v.stock > 0)) {
+                error.textContent = `Selecciona una talla disponible para ${item.name || item.model}.`;
+                document.querySelector(`[data-sizes-for="${item.id}"] .size-button:not(:disabled)`)?.focus();
+                return;
+            }
             const limit = quantityLimit(item, size);
             if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > limit) {
                 error.textContent = `Revisa la cantidad de ${item.name || item.model}. ${quantity > 5 ? "El máximo es de 5 piezas por producto." : quantity > limit ? "Supera las piezas disponibles para esta talla." : "Debe ser un número entero mayor que cero."}`;

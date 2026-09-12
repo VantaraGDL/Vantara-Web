@@ -1,23 +1,33 @@
 export function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-export function productSizes(item) { return item.sizes || []; }
+export function getPublicVariants(item) {
+    return (item.variants || []).filter(v => Number.isInteger(v.stock) && v.stock >= 0);
+}
+export function productSizes(item) { return getPublicVariants(item).map(v => v.size); }
 export function variantStock(item,size) {
-    if (!item.variants?.length) return 0;
-    const variant=item.requiresSize ? item.variants.find(v=>v.size===size) : item.variants[0];
+    const variant=getPublicVariants(item).find(v=>v.size===size);
     return variant ? variant.stock : 0;
 }
 export function sizeUnavailable(item,size) {return variantStock(item,size)===0;}
 export function quantityLimit(item,size) {
     const max=Math.min(5,item.maxQuantity ?? 5);
-    if(item.requiresSize && !size)return item.variants?.length ? max : 0;
-    const stock=variantStock(item,size);
-    return stock===null ? max : Math.min(max,stock);
+    if(!size)return getPublicVariants(item).some(v=>v.stock>0) ? max : 0;
+    return Math.min(max,variantStock(item,size));
+}
+export function getKnownStockTotal(item) {
+    return getPublicVariants(item).reduce((sum,v)=>sum+v.stock,0);
 }
 export function getTotalStock(item) {
-    const stocks=(item.variants || []).map(v=>v.stock);
-    const known=stocks.reduce((sum,stock)=>sum+(stock ?? 0),0);
-    return known>0 ? known : stocks.some(stock=>stock===null) ? null : 0;
+    const total=getKnownStockTotal(item);
+    return total>0 ? total : (item.variants || []).some(v=>v.stock==null) ? null : 0;
+}
+export function getProductBadge(item) {
+    const variants=item.variants || [];
+    if(variants.length && variants.every(v=>v.stock===0))return {kind:'sold-out',label:'AGOTADO'};
+    const total=getKnownStockTotal(item);
+    if(total>=1 && total<5)return {kind:'low-stock',label:'ÚLTIMAS PIEZAS'};
+    return item.newRelease ? {kind:'new',label:'NUEVO'} : null;
 }
 export function knownPrice(item) {return item.price!==null && item.price!==undefined && Number.isFinite(Number(item.price));}
 export function calculateOrder(selected,selection) {
