@@ -257,3 +257,42 @@ body.public-page { font-size: var(--font-body); }
  .public-page .product-main-image{max-width:520px;height:640px}
  .public-page .nav-links a{font-size:1rem}
 }
+
+/* Public motion tokens and restrained visual feedback. */
+.public-page{--transition-quiet:130ms ease;--motion-fast:130ms;--motion-normal:190ms;--motion-slide:220ms;--motion-entry:260ms;--motion-ease:cubic-bezier(.2,.7,.2,1);--motion-distance:6px}
+@media(prefers-reduced-motion:no-preference){
+
+ .public-page :is(button,.button,.outline-cta,.brand-explorer a,.contact-card,.editorial-tiles a,.product-card,.size-button,.thumbnail-button){transition:background-color var(--motion-fast) var(--motion-ease),border-color var(--motion-fast) var(--motion-ease),color var(--motion-fast) var(--motion-ease),transform var(--motion-fast) var(--motion-ease)}
+ .public-page :is(button:not(:disabled),.button,.outline-cta):active{transform:scale(.985)}
+ .public-page :is(button:disabled,.quantity-inactive button){transform:none}
+ .public-page :is(.nav-links a,.nav-links a::after){transition:color var(--motion-fast) var(--motion-ease),opacity var(--motion-fast) var(--motion-ease)}
+ .public-page .mobile-menu{transform:translateY(-4px);transition:opacity var(--motion-normal) var(--motion-ease),transform var(--motion-normal) var(--motion-ease),visibility var(--motion-normal)}
+ .public-page .mobile-menu.open{transform:translateY(0)}
+ .public-page .outfit-card{transition:background-color var(--motion-fast) var(--motion-ease),border-color var(--motion-fast) var(--motion-ease),opacity var(--motion-fast) var(--motion-ease)}
+ .public-page .product-image img{transition:opacity var(--motion-fast) var(--motion-ease),transform var(--motion-fast) var(--motion-ease)}
+ .public-page .mobile-menu .mobile-menu-links a{opacity:1;transform:none;transition:color var(--motion-fast) var(--motion-ease);transition-delay:0s}
+ .public-page :is(.no-products,.product-error){animation:public-page-enter var(--motion-fast) var(--motion-ease)}
+ .public-page .release-slide{animation:public-page-enter var(--motion-slide) var(--motion-ease)}
+ .public-page .release-dot::before{transition:background-color var(--motion-fast) var(--motion-ease),transform var(--motion-fast) var(--motion-ease)}
+ .public-page :is(.contact-card>span,.brand-explorer a span){transition:transform var(--motion-fast) var(--motion-ease)}
+ .public-page :is(.product-card:focus-within,.contact-card:focus-visible,.editorial-tiles a:focus-visible){border-color:var(--accent)}
+ .public-page .low-stock-note{transition:opacity var(--motion-fast) var(--motion-ease)}
+ .public-page .low-stock-note:empty{opacity:0}
+ .public-page .order-confirmation{opacity:0;transform:scale(.99);transition:opacity 160ms var(--motion-ease),transform 160ms var(--motion-ease),display 160ms allow-discrete,overlay 160ms allow-discrete}
+ .public-page .order-confirmation[open]{opacity:1;transform:scale(1);transition-duration:190ms}
+ .public-page .order-confirmation::backdrop{opacity:0;transition:opacity 160ms var(--motion-ease),display 160ms allow-discrete,overlay 160ms allow-discrete}
+ .public-page .order-confirmation[open]::backdrop{opacity:1}
+ @starting-style{.public-page .order-confirmation[open]{opacity:0;transform:scale(.99)}.public-page .order-confirmation[open]::backdrop{opacity:0}}
+}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .public-page :is(.product-card,.contact-card,.editorial-tiles a):hover{transform:translateY(-2px)}
+ .public-page .product-card:hover .product-image img{transform:scale(1.02)}
+ .public-page :is(.contact-card:hover>span,.brand-explorer a:hover span){transform:translateX(2px)}
+}
+@keyframes public-page-enter{from{opacity:.4}to{opacity:1}}
+@media(max-width:650px){.public-page{--motion-entry:220ms;--motion-distance:4px}}
+@media(prefers-reduced-motion:reduce){
+ .public-page :is(.product-card,.contact-card,.editorial-tiles a,button,.button,.outline-cta,.mobile-menu,.order-confirmation,.release-dot::before){transform:none}
+ .public-page .low-stock-note{translate:none}
+ .public-page .order-confirmation[open],.public-page .order-confirmation[open]::backdrop{opacity:1}
+}
