@@ -571,3 +571,6 @@
 .viewer-prev { left: 12px; }
 .viewer-next { right: 12px; }
 .viewer-counter { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); padding: .25rem .65rem; background: #111c; border-radius: 12px; color: #fff; font-size: .8rem; pointer-events: none; }
+
+.quantity-control.quantity-inactive{opacity:.5}.quantity-control.quantity-inactive :is(input,button){cursor:not-allowed}
+.low-stock-note{color:var(--color-gold-hover,#d3b780);font-size:.875rem;line-height:1.5;margin:6px 0 0}.low-stock-note:empty{margin:0}

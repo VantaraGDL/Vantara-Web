@@ -1,6 +1,6 @@
 import {createOrderConfirmation} from './order-confirmation.js?v=whatsapp-1';
 import {catalogApi} from './catalog-api.js?v=supabase-2';
-import {escapeHTML,productSizes,sizeUnavailable,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=supabase-2';
+import {escapeHTML,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=supabase-2';
 import {getProductImages,createProductCard} from './product-ui.js?v=supabase-2';
 let products=[],product;
 const productDetail =
@@ -51,7 +51,14 @@ async function loadProduct() {
 }
 loadProduct();
 
+function initialSelection(item) {
+    const single = item.variants?.length === 1 ? item.variants[0] : null;
+    return {size: single?.size === 'Única' && single.stock !== 0 ? single.size : null, quantity: 1};
+}
+
 function renderProduct(product) {
+    orderSelection.clear();
+    orderSelection.set(product.id, initialSelection(product));
     document.querySelector(".back-link").href = "catalogo.html?category=" + encodeURIComponent(product.category);
 
     const images =
@@ -177,6 +184,12 @@ function renderProduct(product) {
     setupSizeButtons();
     setupCollection();
     setupQuantities();
+    document.querySelectorAll('.size-button').forEach(button => {
+        const id = Number(button.closest('[data-sizes-for]').dataset.sizesFor);
+        const active = button.dataset.size === orderSelection.get(id)?.size;
+        button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));
+    });
+    if (orderSelection.get(product.id).size) document.querySelector('#stock-status').textContent = 'Talla seleccionada: ' + orderSelection.get(product.id).size;
 
     setupContactButton(product);
     setupGallery();
@@ -235,13 +248,14 @@ function setupCollection() {
     document.querySelectorAll('[data-outfit-select]').forEach(input => {
         input.addEventListener('change', () => {
             const id = Number(input.dataset.outfitSelect);
-            if (input.checked) orderSelection.set(id, { size: null, quantity: 1 });
+            if (input.checked) orderSelection.set(id, initialSelection(products.find(p => p.id === id)));
             else orderSelection.delete(id);
             document.querySelectorAll(`[data-sizes-for="${id}"]`).forEach(group => {
                 group.hidden = !input.checked;
                 group.querySelectorAll('.size-button').forEach(button => {
-                    button.classList.remove('selected');
-                    button.setAttribute('aria-pressed', 'false');
+                    const active = button.dataset.size === orderSelection.get(id)?.size;
+                    button.classList.toggle('selected', active);
+                    button.setAttribute('aria-pressed', String(active));
                 });
             });
             const quantityInput = document.querySelector(`[data-quantity-for="${id}"]`);
@@ -262,10 +276,7 @@ function setupSizeButtons() {
             button.addEventListener('click', () => {
                 if (!orderSelection.has(id) || sizeUnavailable(item, button.dataset.size)) return;
                 const selection = orderSelection.get(id);
-                if (selection.size !== button.dataset.size) {
-                    selection.quantity = 1;
-                    document.querySelector(`[data-quantity-for="${id}"]`).value = 1;
-                }
+                if (selection.size !== button.dataset.size) selection.quantity = 1;
                 selection.size = button.dataset.size;
                 document.querySelectorAll(`[data-sizes-for="${id}"] .size-button`).forEach(option => {
                     const active = option.dataset.size === button.dataset.size;
@@ -423,10 +434,10 @@ function getRelationScore(
 
 function renderQuantity(item) {
     return `<div class="quantity-control" role="group" aria-label="Cantidad de ${escapeHTML(item.name || item.model)}">
-        <button type="button" data-quantity-step="-1" aria-label="Quitar una pieza de ${escapeHTML(item.name || item.model)}">−</button>
+        <button type="button" data-quantity-step="-1" disabled aria-label="Quitar una pieza de ${escapeHTML(item.name || item.model)}">−</button>
         <label class="quantity-value"><input type="number" min="1" max="5" step="1" value="1" inputmode="numeric"
-            data-quantity-for="${item.id}" aria-label="Cantidad de ${escapeHTML(item.name || item.model)}"><span>pzas</span></label>
-        <button type="button" data-quantity-step="1" aria-label="Añadir una pieza de ${escapeHTML(item.name || item.model)}">+</button>
+            data-quantity-for="${item.id}" disabled aria-label="Cantidad de ${escapeHTML(item.name || item.model)}"><span>pzas</span></label>
+        <button type="button" data-quantity-step="1" disabled aria-label="Añadir una pieza de ${escapeHTML(item.name || item.model)}">+</button>
     </div>`;
 }
 
@@ -443,27 +454,56 @@ function moveCollectionCard(input) {
     if (input.checked) list.scrollLeft = 0;
 }
 
+function quantityReady(item) {
+    const selection = orderSelection.get(item.id);
+    if (!selection) return false;
+    if (productSizes(item).length && (!productSizes(item).includes(selection.size) || sizeUnavailable(item, selection.size))) return false;
+    return quantityLimit(item, selection.size) >= 1;
+}
+
 function syncQuantityLimit(item) {
     const input = document.querySelector(`[data-quantity-for="${item.id}"]`);
     const limit = quantityLimit(item, orderSelection.get(item.id)?.size);
     if (Number.isFinite(limit)) input.max = Math.max(0, limit);
     else input.removeAttribute('max');
+    input.disabled = !quantityReady(item);
+    input.closest('.quantity-control').classList.toggle('quantity-inactive', input.disabled);
+    const selection = orderSelection.get(item.id);
+    if (selection && !input.disabled) {
+        selection.quantity = Math.max(1, Math.min(limit, Number.isSafeInteger(selection.quantity) ? selection.quantity : 1));
+        input.value = selection.quantity;
+    }
     updateQuantityButtons(input);
+    const indicator = document.querySelector(`[data-low-stock-for="${item.id}"]`);
+    if (indicator) {
+        const stock = selection?.size ? variantStock(item, selection.size) : null;
+        const text = Number.isInteger(stock) && stock > 0 && stock < 5
+            ? stock === 1 ? 'Última pieza' : `Últimas ${stock} piezas`
+            : '';
+        if (indicator.textContent !== text) indicator.textContent = text;
+    }
 }
 
 function setupQuantities() {
     document.querySelectorAll('[data-quantity-for]').forEach(input => {
         const id = Number(input.dataset.quantityFor);
         const item = products.find(p => p.id === id);
+        const indicator = document.createElement('p');
+        indicator.className = 'low-stock-note';
+        indicator.dataset.lowStockFor = id;
+        indicator.setAttribute('aria-live', 'polite');
+        indicator.setAttribute('aria-atomic', 'true');
+        input.closest('.size-quantity-row').after(indicator);
         syncQuantityLimit(item);
         input.addEventListener('input', () => {
-            if (!orderSelection.has(id)) return;
+            if (input.disabled || !quantityReady(item)) return;
             orderSelection.get(id).quantity = input.valueAsNumber;
             updateQuantityButtons(input);
             updateOrderSummary();
         });
         input.closest(".quantity-control").querySelectorAll("[data-quantity-step]").forEach(button => {
             button.addEventListener("click", () => {
+                if (input.disabled || !quantityReady(item)) return;
                 const current = Number.isSafeInteger(input.valueAsNumber) ? input.valueAsNumber : 1;
                 const limit = quantityLimit(item, orderSelection.get(id)?.size);
                 input.value = Math.max(1, Math.min(limit, current + Number(button.dataset.quantityStep)));
@@ -475,8 +515,8 @@ function setupQuantities() {
 
 function updateQuantityButtons(input) {
     const controls = input.closest('.quantity-control');
-    controls.querySelector('[data-quantity-step="-1"]').disabled = !(input.valueAsNumber > 1);
-    controls.querySelector('[data-quantity-step="1"]').disabled = input.hasAttribute('max') && input.valueAsNumber >= Number(input.max);
+    controls.querySelector('[data-quantity-step="-1"]').disabled = input.disabled || !(input.valueAsNumber > 1);
+    controls.querySelector('[data-quantity-step="1"]').disabled = input.disabled || input.hasAttribute('max') && input.valueAsNumber >= Number(input.max);
 }
 
 function setupImageViewer() {
