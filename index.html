@@ -12,12 +12,14 @@
     <meta name="description" content="Descubre el catálogo de Vant'ara: streetwear, ropa y accesorios seleccionados en Guadalajara, México.">
 
     <link rel="stylesheet" href="css/global.css?v=editorial-1">
-    <link rel="stylesheet" href="css/home.css?v=editorial-1">
+    <link rel="stylesheet" href="css/home.css?v=editorial-2">
+    <link rel="stylesheet" href="css/public-theme.css?v=public-1">
 </head>
 
-<body class="home-page">
+<body class="public-page home-page">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
+<div class="home-shell public-shell">
 <header class="navbar">
 
     <a href="index.html" class="logo">
@@ -33,6 +35,7 @@
     </nav>
 
 
+    <div class="header-tools"><a href="catalogo.html" aria-label="Buscar en el catálogo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg></a><a href="contacto.html" aria-label="Contactar a Vant’ara"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H9l-5 4V4Z"/></svg></a></div>
     <button
         class="menu-toggle"
         id="menu-toggle"
@@ -47,6 +50,89 @@
 </header>
 
 
+    <main id="contenido" tabindex="-1">
+
+        <section class="hero" aria-labelledby="hero-title">
+
+            <div class="hero-content">
+                <p class="hero-label">
+                    MÁS QUE ROPA
+                </p>
+
+                <h1 id="hero-title">
+                    STREETWEAR <span>SIN LÍMITES</span>
+                </h1>
+
+                <p>
+                    Moda, actitud y accesorios que definen tu historia.<br>Descubre una nueva forma de vestir.
+                </p>
+
+                <a
+                    href="catalogo.html"
+                    class="button"
+                >
+                    Explorar catálogo <span aria-hidden="true">→</span>
+                </a>
+            </div>
+
+            <div class="hero-signature"><p>DISCIPLINA<br>ESTILO<br>LIBERTAD</p><span></span><p>VANT’ARA</p></div>
+        </section>
+
+
+        <section class="home-benefits" aria-label="Sobre nuestra selección y servicio">
+            <ul>
+                <li>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg>
+                    <div><h2>Piezas seleccionadas</h2><p>Streetwear, ropa y accesorios.</p></div>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h11v12H3V6Zm11 5h4l3 4v3h-7M6 6v4h5V6"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>
+                    <div><h2>Envíos a México</h2><p>Costos y tiempos confirmados antes de cada pedido.</p></div>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 4h16v12H9l-5 4V4Zm4 5h8M8 12h5"/></svg>
+                    <div><h2>Consulta tu pieza</h2><p>Información sobre tallas y disponibilidad.</p></div>
+                </li>
+            </ul>
+        </section>
+
+        <section class="featured" aria-labelledby="featured-title">
+            <div class="featured-catalog">
+                <div class="section-header"><h2 id="featured-title">Productos destacados</h2><a href="catalogo.html">Ver todo <span aria-hidden="true">→</span></a></div>
+                <div id="featured-products" class="product-grid"></div>
+            </div>
+            <a class="editorial-banner" href="catalogo.html?category=Accessories">
+                <div><p class="editorial-kicker">DETALLES<br>QUE HABLAN</p><span class="gold-rule"></span><p>ACCESORIOS<br>ROPA<br>Y MÁS</p></div>
+                <span class="banner-caption">ESTILO EN CADA ELECCIÓN <span aria-hidden="true">→</span></span>
+            </a>
+        </section>
+        <section class="home-discovery" aria-label="Explora Vant’ara">
+            <div class="look-panel" id="look-panel">
+                <h2>Encuentra tu próximo look</h2><p>Explora nuestro catálogo y filtra por tu estilo.</p>
+                <div class="look-controls">
+                    <a class="catalog-search-link" href="catalogo.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg><span>Buscar productos, marcas o categorías…</span><span aria-hidden="true">→</span></a>
+                    <a class="catalog-sort-link" href="catalogo.html">Ordenar en catálogo <span aria-hidden="true">⌄</span></a>
+                </div>
+                <nav class="look-chips" aria-label="Explorar por prenda">
+                    <a href="catalogo.html" class="chip-primary">Todas</a><a href="catalogo.html?category=Hoodies">Hoodies</a><a href="catalogo.html?category=T-Shirts">Playeras</a><a href="catalogo.html?category=Pants">Pants</a><a href="catalogo.html?category=Shorts">Shorts</a><a href="catalogo.html?category=Accessories">Accesorios</a>
+                </nav>
+            </div>
+            <div class="inspiration-panel">
+                <div class="inspiration-copy"><p class="eyebrow">EL UNIVERSO VANT’ARA</p><h2>ESTILO QUE<br>INSPIRA</h2><p>Streetwear, ropa y accesorios seleccionados. Encuentra tu forma de llevarlos.</p><a class="outline-cta" href="nosotros.html">CONOCE MÁS <span aria-hidden="true">→</span></a></div>
+                <nav class="editorial-tiles" aria-label="Descubre nuestro estilo">
+                    <a class="tile-hoodies" href="catalogo.html?category=Hoodies"><span>HOODIES <b aria-hidden="true">→</b></span></a>
+                    <a class="tile-accessories" href="catalogo.html?category=Accessories"><span>ACCESORIOS <b aria-hidden="true">→</b></span></a>
+                    <a class="tile-style" href="nosotros.html"><span>VANT’ARA <b aria-hidden="true">→</b></span></a>
+                    <a class="tile-shirts" href="catalogo.html?category=T-Shirts"><span>PLAYERAS <b aria-hidden="true">→</b></span></a>
+                </nav>
+            </div>
+        </section>
+
+    </main>
+
+
+    <footer class="public-footer"><a class="footer-wordmark" href="index.html">VANT’ARA</a><p>Streetwear, ropa y accesorios seleccionados.</p><nav aria-label="Navegación del pie"><a href="catalogo.html">Catálogo</a><a href="nosotros.html">Nosotros</a><a href="contacto.html">Contacto</a><a href="https://www.instagram.com/vant.ara_gdl/" target="_blank" rel="noopener noreferrer">Instagram ↗</a></nav><small>Guadalajara, México · © 2026</small></footer>
+</div>
 <div
     class="mobile-menu"
     id="mobile-menu"
@@ -104,149 +190,6 @@
     </div>
 
 </div>
-
-
-    <main id="contenido" tabindex="-1">
-
-        <section class="hero" aria-labelledby="hero-title">
-
-            <div class="hero-content">
-                <p class="hero-label">
-                    NUEVO DROP
-                </p>
-
-                <h1 id="hero-title">
-                    Streetwear <span>& Accessories</span>
-                </h1>
-
-                <p>
-                    Descubre las últimas piezas disponibles.
-                </p>
-
-                <a
-                    href="catalogo.html"
-                    class="button"
-                >
-                    Ver catálogo
-                </a>
-            </div>
-
-        </section>
-
-
-        <section class="home-benefits" aria-label="Sobre nuestra selección y servicio">
-            <ul>
-                <li>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg>
-                    <div><h2>Piezas seleccionadas</h2><p>Streetwear, ropa y accesorios.</p></div>
-                </li>
-                <li>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h11v12H3V6Zm11 5h4l3 4v3h-7M6 6v4h5V6"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>
-                    <div><h2>Envíos a México</h2><p>Costos y tiempos confirmados antes de cada pedido.</p></div>
-                </li>
-                <li>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 4h16v12H9l-5 4V4Zm4 5h8M8 12h5"/></svg>
-                    <div><h2>Consulta tu pieza</h2><p>Información sobre tallas y disponibilidad.</p></div>
-                </li>
-            </ul>
-        </section>
-
-        <section class="featured">
-
-            <div class="section-header">
-                <p>NUEVO</p>
-                <h2>Productos destacados</h2>
-            </div>
-
-            <div
-                id="featured-products"
-                class="product-grid"
-            >
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <footer class="footer">
-
-        <div class="footer-main">
-
-            <div class="footer-brand">
-
-                <a
-                    href="index.html"
-                    class="footer-logo"
-                >
-                    VANT'ARA
-                </a>
-
-                <p>
-                    Streetwear, ropa y accesorios seleccionados.
-                </p>
-
-            </div>
-
-
-            <div class="footer-column">
-
-                <p class="footer-title">
-                    EXPLORA
-                </p>
-
-                <a href="index.html">
-                    Inicio
-                </a>
-
-                <a href="catalogo.html">
-                    Catálogo
-                </a>
-
-                <a href="nosotros.html">
-                    Nosotros
-                </a>
-                
-
-            </div>
-
-
-            <div class="footer-column">
-
-                <p class="footer-title">
-                    CONTACTO
-                </p>
-
-                <a href="contacto.html">
-                    Contacto
-                </a>
-
-                <a
-                    href="https://www.instagram.com/vant.ara_gdl/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Instagram
-                </a>
-
-            </div>
-
-        </div>
-
-
-        <div class="footer-bottom">
-
-            <p>
-                © 2026 Vant'ara
-            </p>
-
-            <p>
-                Guadalajara, México
-            </p>
-
-        </div>
-
-    </footer>
 
 
     <script type="module" src="js/home.js?v=supabase-2"></script>

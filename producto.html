@@ -13,12 +13,14 @@
 
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/producto.css">
+    <link rel="stylesheet" href="css/public-theme.css?v=public-1">
 </head>
 
-<body>
+<body class="public-page producto-page">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-    <header class="navbar">
+    <div class="public-shell">
+<header class="navbar">
 
     <a href="index.html" class="logo">
         VANT'ARA
@@ -27,12 +29,13 @@
 
     <nav class="nav-links" aria-label="Principal">
         <a href="index.html">Inicio</a>
-        <a href="catalogo.html">Catálogo</a>
+        <a href="catalogo.html" aria-current="page">Catálogo</a>
         <a href="nosotros.html">Nosotros</a>
         <a href="contacto.html">Contacto</a>
     </nav>
 
 
+    <div class="header-tools"><a href="catalogo.html" aria-label="Buscar en el catálogo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg></a><a href="contacto.html" aria-label="Contactar a Vant’ara"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H9l-5 4V4Z"/></svg></a></div>
     <button
         class="menu-toggle"
         id="menu-toggle"
@@ -45,65 +48,6 @@
     </button>
 
 </header>
-
-
-<div
-    class="mobile-menu"
-    id="mobile-menu"
-    aria-hidden="true"
->
-
-    <div class="mobile-menu-header">
-
-        <a href="index.html" class="logo">
-            VANT'ARA
-        </a>
-
-        <button
-            class="mobile-menu-close"
-            id="mobile-menu-close"
-            aria-label="Cerrar menú"
-        >
-            ×
-        </button>
-
-    </div>
-
-
-    <nav class="mobile-menu-links" aria-label="Principal móvil">
-
-        <a href="index.html">
-            Inicio
-        </a>
-
-        <a href="catalogo.html">
-            Catálogo
-        </a>
-
-        <a href="nosotros.html">
-            Nosotros
-        </a>
-
-        <a href="contacto.html">
-            Contacto
-        </a>
-
-    </nav>
-
-
-    <div class="mobile-menu-footer">
-
-        <a
-            href="https://www.instagram.com/vant.ara_gdl/"
-            target="_blank"
-            rel="noopener noreferrer"
-        >
-            Instagram
-        </a>
-
-    </div>
-
-</div>
 
 
     <main id="contenido" tabindex="-1" class="product-page">
@@ -170,84 +114,68 @@
     </main>
 
 
-    <footer class="footer">
+    <footer class="public-footer"><a class="footer-wordmark" href="index.html">VANT’ARA</a><p>Streetwear, ropa y accesorios seleccionados.</p><nav aria-label="Navegación del pie"><a href="catalogo.html">Catálogo</a><a href="nosotros.html">Nosotros</a><a href="contacto.html">Contacto</a><a href="https://www.instagram.com/vant.ara_gdl/" target="_blank" rel="noopener noreferrer">Instagram ↗</a></nav><small>Guadalajara, México · © 2026</small></footer>
+</div>
+<div
+    class="mobile-menu"
+    id="mobile-menu"
+    aria-hidden="true"
+>
 
-        <div class="footer-main">
+    <div class="mobile-menu-header">
 
-            <div class="footer-brand">
+        <a href="index.html" class="logo">
+            VANT'ARA
+        </a>
 
-                <a
-                    href="index.html"
-                    class="footer-logo"
-                >
-                    VANT'ARA
-                </a>
+        <button
+            class="mobile-menu-close"
+            id="mobile-menu-close"
+            aria-label="Cerrar menú"
+        >
+            ×
+        </button>
 
-                <p>
-                    Streetwear, ropa y accesorios seleccionados.
-                </p>
-
-            </div>
-
-
-            <div class="footer-column">
-
-                <p class="footer-title">
-                    EXPLORA
-                </p>
-
-                <a href="index.html">
-                    Inicio
-                </a>
-
-                <a href="catalogo.html">
-                    Catálogo
-                </a>
-
-                <a href="nosotros.html">
-                    Nosotros
-                </a>
-                
-
-            </div>
+    </div>
 
 
-            <div class="footer-column">
+    <nav class="mobile-menu-links" aria-label="Principal móvil">
 
-                <p class="footer-title">
-                    CONTACTO
-                </p>
+        <a href="index.html">
+            Inicio
+        </a>
 
-                <a href="contacto.html">
-                    Contacto
-                </a>
+        <a href="catalogo.html" aria-current="page">
+            Catálogo
+        </a>
 
-                <a
-                    href="https://www.instagram.com/vant.ara_gdl/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Instagram
-                </a>
+        <a href="nosotros.html">
+            Nosotros
+        </a>
 
-            </div>
+        <a href="contacto.html">
+            Contacto
+        </a>
 
-        </div>
+    </nav>
 
 
-        <div class="footer-bottom">
+    <div class="mobile-menu-footer">
 
-            <p>
-                © 2026 Vant'ara
-            </p>
+        <a
+            href="https://www.instagram.com/vant.ara_gdl/"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            Instagram
+        </a>
 
-            <p>
-                Guadalajara, México
-            </p>
+    </div>
 
-        </div>
+</div>
 
-    </footer>
+
+
 
 
     <script type="module" src="js/producto.js?v=supabase-2"></script>
