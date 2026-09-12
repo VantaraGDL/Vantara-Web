@@ -7,6 +7,13 @@
  --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem;
  --page-gutter: clamp(16px,3.3vw,72px); --section-space: clamp(40px,5vw,88px);
  --editorial-font: Georgia,'Times New Roman',serif;
+ --font-body: 1.0625rem;
+ --font-small: .875rem;
+ --font-label: .8125rem;
+ --font-control: 1rem;
+ --font-card: .9375rem;
+ --font-price: 1rem;
+ --font-intro: clamp(1rem,1.4vw,1.1875rem);
 }
 body.public-page { padding: 6px .65vw; background: #070e15; color: var(--text-primary); color-scheme: dark; }
 .public-page .public-shell { width: 100%; max-width: none; margin: 0; background: linear-gradient(140deg,#07131c,#0b1823); border: 1px solid #53677924; border-radius: var(--shell-radius); box-shadow: none; overflow: clip; }
@@ -139,4 +146,51 @@ body.public-page { padding: 6px .65vw; background: #070e15; color: var(--text-pr
  .public-footer > p { border-left: 0; padding: 0; flex-basis: 100%; }
  .public-footer nav { margin-left: 0; flex-basis: 100%; }
  .public-footer small { flex-basis: 100%; }
+}
+
+/* Public readability scale: preserve large editorial headings and card columns. */
+body.public-page { font-size: var(--font-body); }
+.public-page .nav-links a { font-size: var(--font-card); }
+.public-page :is(.public-footer p,.public-footer small,.public-footer nav,.back-link,.catalog-count,.stock-status,.outfit-hint,.outfit-info legend,.viewer-toolbar,.viewer-counter) { font-size: var(--font-small); line-height: 1.6; }
+.public-page :is(.catalog-label,.about-label,.contact-label,.contact-type,.related-header>p,.product-brand-detail,.product-option-label,.stock-badge) { font-size: var(--font-label); }
+.public-page :is(.catalog-description,.about-intro,.contact-header>p:last-child) { font-size: var(--font-intro); }
+.public-page :is(.button,.product-action,.size-button,.search-input,.catalog-tools select,.sort-menu summary,.sort-options select,.filter-button,.stock-filter-label) { font-size: var(--font-control); }
+.public-page .sort-options>label:first-child { font-size: var(--font-small); }
+.public-page :is(.product-brand,.product-info h3) { font-size: var(--font-card); overflow-wrap: anywhere; }
+.public-page .product-price { font-size: var(--font-price); }
+.public-page .product-price-detail { font-size: 1.5rem; }
+.public-page .product-data h1 { font-size: clamp(30px,2.8vw,50px); overflow-wrap: anywhere; }
+.public-page .catalog-header h1 { font-size: clamp(38px,5.5vw,84px); }
+.public-page :is(.product-option-value,.product-description p,.about-block div p,.contact-info div>p:last-child) { font-size: var(--font-body); line-height: 1.75; max-width: 65ch; }
+.public-page :is(.outfit-info label,.outfit-info>p,.order-error) { font-size: var(--font-card); }
+.public-page .outfit h2 { font-size: 1.375rem; overflow-wrap: anywhere; }
+.public-page .order-panel #order-summary { font-size: var(--font-body); overflow-wrap: anywhere; }
+.public-page .quantity-control .quantity-value { font-size: var(--font-small); }
+.public-page .quantity-control input { font-size: var(--font-control); }
+.public-page .about-block h2 { font-size: clamp(30px,3vw,34px); }
+.public-page .contact-card h2 { font-size: clamp(25px,3vw,40px); }
+.public-page .contact-card>div { min-width: 0; }
+.public-page .order-confirmation { font-size: var(--font-body); }
+.public-page .order-confirmation h3 { font-size: 1.0625rem; }
+.public-page .confirmation-totals strong { font-size: 1.25rem; }
+.public-page .hero-content>p:not(.hero-label) { font-size: var(--font-control); }
+.public-page :is(.hero-label,.eyebrow,.inspiration-copy .eyebrow,.outline-cta,.editorial-tiles a span,.release-label,.release-cta) { font-size: var(--font-label); }
+.public-page .hero .button { font-size: var(--font-label); white-space: normal; }
+.public-page .hero-signature p { font-size: .75rem; }
+.public-page .hero-signature p:last-child { font-size: var(--font-label); }
+.public-page .home-benefits h2 { font-size: var(--font-small); }
+.public-page .home-benefits p { font-size: var(--font-label); }
+.public-page :is(.home-benefits li>div,.inspiration-copy) { min-width: 0; }
+.public-page .section-header { flex-wrap: wrap; }
+.public-page .section-header h2 { font-size: 1.375rem; }
+.public-page :is(.section-header>a,.featured-catalog>[role],.inspiration-copy>p:not(.eyebrow),.release-brand) { font-size: var(--font-small); }
+.public-page .release-name { font-size: clamp(1.3rem,2vw,1.9rem); }
+.public-page .inspiration-copy>p:not(.eyebrow) { max-width: 55ch; }
+.public-page :is(.editorial-tiles a span,.confirmation-items h3) { overflow-wrap: anywhere; }
+@media(max-width:650px) {
+ .public-page :is(.product-brand,.product-info h3) { font-size: var(--font-small); }
+ .public-page .product-price { font-size: var(--font-card); }
+ .public-page .hero { padding-bottom: 100px; }
+ .public-page .hero-signature { max-width: 88%; flex-wrap: wrap; gap: 10px; }
+ .public-page .catalog-tools { min-width: 0; }
 }

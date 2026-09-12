@@ -31,14 +31,15 @@ const requestedCategory = new URLSearchParams(window.location.search).get("categ
 let selectedCategory = Array.from(categoryFilter.options).some(option => option.value === requestedCategory)
     ? requestedCategory : "all";
 categoryFilter.value = selectedCategory;
-let selectedBrand = "all";
+const requestedBrand = new URLSearchParams(window.location.search).get("brand")?.trim();
+let selectedBrand = requestedBrand || "all";
 let searchTerm = "";
 let selectedSort = "default";
 
 function updateBrandOptions() {
 
     const availableOptions = brandOptions.filter(option => {
-        if (option.value === "all") {
+        if (option.value === "all" || (selectedCategory === "all" && option.value === requestedBrand)) {
             return true;
         }
 
@@ -375,6 +376,7 @@ async function loadCatalog() {
         products=await catalogApi.loadProducts();
         const option=(value,text)=>{const o=document.createElement('option');o.value=value;o.textContent=text;return o;};
         brandOptions=[option('all','Todas las marcas'),...[...new Set(products.map(p=>p.brand))].sort().map(name=>option(name,name))];
+        if(requestedBrand && !brandOptions.some(o=>o.value===requestedBrand))brandOptions.push(option(requestedBrand,requestedBrand));
         const known=new Set([...categoryFilter.options].map(o=>o.value));
         for(const p of products)if(!known.has(p.category)){categoryFilter.append(option(p.category,p.categoryName));known.add(p.category);}
         noProductsMessage.textContent=products.length ? 'No se encontraron productos con estos filtros.' : 'No hay productos disponibles por el momento.';
