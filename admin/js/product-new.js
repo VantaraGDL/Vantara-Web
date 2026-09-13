@@ -1,3 +1,4 @@
+import {mountSaleFields} from './sale-fields.js?v=sales-1';
 import {loadSizes} from './sizes.js?v=admin-5';
 import {mountTaxonomyCreation} from './taxonomy-create.js?v=admin-3';
 import {projectUrl,publishableKey} from './config.js';
@@ -20,6 +21,7 @@ async function boot(){try{
  options('brand_id',brands,'Selecciona marca');options('category_id',categories,'Selecciona categoría');options('collection_id',collections,'Sin colección');
  form.elements.brand_id.required=true;form.elements.category_id.required=true;
  mountTaxonomyCreation(client,form,{busy:()=>busy,lock:value=>{busy=value;form.querySelector('fieldset').disabled=value;},changed:()=>dirty=true,say});
+ const saleFields=mountSaleFields(form);
  const {options:SIZES,sizeLabel}=await loadSizes(client);
  const values=new Map(),chosen=new Set();
  function variants(){const box=document.querySelector('#variants');box.replaceChildren();
@@ -31,6 +33,7 @@ async function boot(){try{
  form.addEventListener('submit',async e=>{e.preventDefault();if(busy)return;
   try{const product={};for(const key of ['name','model','color','brand_id','category_id','material','description','collection_id'])product[key]=form.elements[key].value.trim()||null;
    if(!product.name||!product.brand_id||!product.category_id)throw new Error('Completa nombre, marca y categoría.');product.price=numberOrNull(form.elements.price.value);product.featured=form.elements.featured.checked;product.new_release=form.elements.new_release.checked;
+   Object.assign(product,saleFields());
    const variants=[...form.querySelectorAll('[data-size]:checked')].map(c=>({size:c.dataset.size,stock:numberOrNull([...form.querySelectorAll('[data-stock]')].find(i=>i.dataset.stock===c.dataset.size).value,true)}));
    if(!variants.length)throw new Error('Selecciona al menos una talla.');
    busy=true;form.querySelector('fieldset').disabled=true;form.setAttribute('aria-busy','true');say('Creando producto…');

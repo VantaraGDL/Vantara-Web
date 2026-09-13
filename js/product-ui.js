@@ -1,4 +1,4 @@
-import {escapeHTML,knownPrice,getProductBadge} from './catalog-logic.js?v=badges-1';
+import {escapeHTML,getProductBadges,getProductPrice,isProductOnSale,getOriginalPrice} from './catalog-logic.js?v=badges-order-2';
 export function getProductImages(product) {
 
     if (
@@ -38,12 +38,12 @@ export function createProductCard(product) {
             ? images[1]
             : null;
 
-    const badge = getProductBadge(product);
+    const badges = getProductBadges(product);
     article.innerHTML = `
         <a href="producto.html?id=${product.id}">
 
             <div class="product-image">
-                ${badge ? `<span class="product-badge product-badge--${badge.kind}">${badge.label}</span>` : ''}
+                ${badges.length ? `<span class="product-badges">${badges.map(badge => `<span class="product-badge product-badge--${badge.kind}">${badge.label}</span>`).join('')}</span>` : ''}
 
                 <img
                     class="
@@ -78,13 +78,7 @@ export function createProductCard(product) {
                     ${escapeHTML(product.name || product.model)}
                 </h3>
 
-                <p class="product-price">
-                    ${
-                        knownPrice(product)
-                            ? `$${product.price} MXN`
-                            : "Precio próximamente"
-                    }
-                </p>
+                <p class="product-price">${renderProductPrice(product)}</p>
 
             </div>
 
@@ -94,4 +88,9 @@ export function createProductCard(product) {
     return article;
 }
 
-
+export function renderProductPrice(product) {
+ const price=getProductPrice(product);
+ if(price===null)return 'Precio próximamente';
+ const money=value=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:2,minimumFractionDigits:0}).format(value)+' MXN';
+ return isProductOnSale(product)?`<del class="price-original" aria-label="Precio original">${money(getOriginalPrice(product))}</del> <span class="price-final" aria-label="Precio en oferta">${money(price)}</span>` : money(price);
+}

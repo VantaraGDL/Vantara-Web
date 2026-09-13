@@ -1,6 +1,6 @@
-import {catalogApi} from './catalog-api.js?v=supabase-2';
-import {getTotalStock} from './catalog-logic.js?v=badges-1';
-import {createProductCard} from './product-ui.js?v=badges-1';
+import {catalogApi} from './catalog-api.js?v=sales-1';
+import {getTotalStock,getProductPrice} from './catalog-logic.js?v=badges-order-2';
+import {createProductCard} from './product-ui.js?v=badges-order-2';
 let products=[];
 let loadError=false;
 const catalogContainer =
@@ -270,18 +270,10 @@ function comparePrice(
     direction
 ) {
 
-    const priceA =
-        a.price === null ||
-        a.price === undefined
-            ? null
-            : Number(a.price);
+    const priceA = getProductPrice(a);
 
 
-    const priceB =
-        b.price === null ||
-        b.price === undefined
-            ? null
-            : Number(b.price);
+    const priceB = getProductPrice(b);
 
 
     /*

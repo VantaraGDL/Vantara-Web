@@ -1,7 +1,7 @@
-import {createOrderConfirmation} from './order-confirmation.js?v=whatsapp-2';
-import {catalogApi} from './catalog-api.js?v=supabase-2';
-import {escapeHTML,getPublicVariants,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=badges-1';
-import {getProductImages,createProductCard} from './product-ui.js?v=badges-1';
+import {createOrderConfirmation} from './order-confirmation.js?v=badges-order-2';
+import {catalogApi} from './catalog-api.js?v=sales-1';
+import {escapeHTML,getOrderPrices,getOrderPricing,isProductOnSale,getPublicVariants,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=badges-order-2';
+import {getProductImages,createProductCard,renderProductPrice} from './product-ui.js?v=badges-order-2';
 let products=[],product;
 const productDetail =
     document.querySelector("#product-detail");
@@ -70,9 +70,7 @@ function renderProduct(product) {
             ];
 
 
-    const price = knownPrice(product)
-        ? `$${product.price} MXN`
-        : "Precio próximamente";
+    const price = renderProductPrice(product);
 
 
     const sizesHTML =
@@ -127,8 +125,9 @@ function renderProduct(product) {
             </h1>
 
 
-            <p class="product-price-detail">
+            <p class="product-price-detail" data-order-price="${product.id}">
                 ${price}
+                ${isProductOnSale(product) ? `<span class="product-sale-label">OFERTA -${product.discountPercent}%</span>` : ''}
             </p>
 
 
@@ -215,6 +214,7 @@ function renderCollection(current) {
     const title = current.collectionName;
     return `<section class="outfit" aria-labelledby="outfit-title">
         <h2 id="outfit-title">Arma tu conjunto — ${escapeHTML(title)}</h2>
+        <p class="outfit-hint">Las ofertas individuales no se acumulan con el descuento por conjunto. Al alcanzar su mínimo, se usan los precios originales y el descuento de colección. </p>
         <p class="outfit-hint">Agrega otras prendas si quieres completar tu conjunto. El total incluye el producto actual.</p>
         <div class="outfit-list">${members.map((item, index) => `
             <article class="outfit-card" data-outfit-id="${item.id}" data-original-order="${index}">
@@ -222,7 +222,7 @@ function renderCollection(current) {
                 <div class="outfit-info">
                     <label><input type="checkbox" data-outfit-select="${item.id}">
                         <span>${escapeHTML(item.name || item.model)}</span></label>
-                    <p>${knownPrice(item) ? money(item.price) : 'Precio por confirmar'}</p>
+                    <p data-order-price="${item.id}">${renderProductPrice(item)}</p>
                     <fieldset data-sizes-for="${item.id}" hidden>
                         <legend>Talla — ${escapeHTML(item.name || item.model)}</legend>
                         <div class="size-quantity-row"><div class="size-list">${createSizes(item)}</div>${renderQuantity(item)}</div>
@@ -235,6 +235,13 @@ function renderCollection(current) {
 
 function updateOrderSummary() {
     const selected = products.filter(p => orderSelection.has(p.id));
+    const prices = getOrderPrices(selected,orderSelection);
+    document.querySelectorAll('[data-order-price]').forEach(element => {
+        const item = products.find(p => p.id === Number(element.dataset.orderPrice));
+        const collectionPricing = prices.has(item.id) && isProductOnSale(item) && prices.get(item.id) === Number(item.price);
+        element.innerHTML = renderProductPrice(collectionPricing ? {...item,onSale:false} : item)
+            + (collectionPricing ? ' <small>Precio base para descuento por conjunto</small>' : item.id === product.id && isProductOnSale(item) ? ` <span class="product-sale-label">OFERTA -${item.discountPercent}%</span>` : '');
+    });
     const pieces = selected.reduce((sum, p) => sum + orderSelection.get(p.id).quantity, 0);
     const valid = selected.every(p => Number.isSafeInteger(orderSelection.get(p.id).quantity) && orderSelection.get(p.id).quantity > 0 && orderSelection.get(p.id).quantity <= quantityLimit(p, orderSelection.get(p.id).size));
     document.querySelectorAll("#outfit-summary, #order-summary").forEach(summary => {
@@ -321,9 +328,10 @@ function setupContactButton() {
                 error.textContent = `${item.name || item.model} está agotado.`; return;
             }
         }
+        const orderPricing = getOrderPricing(selected,orderSelection);
         const rows = selected.map(item => {
             const { size, quantity } = orderSelection.get(item.id);
-            return {name: item.name || item.model, size: size || item.variants?.[0]?.size || 'No requiere talla', quantity, price: knownPrice(item) ? item.price : null};
+            return {name: item.name || item.model, size: size || item.variants?.[0]?.size || 'No requiere talla', quantity, ...orderPricing.get(item.id)};
         });
         openConfirmation(rows, calculateOrder(selected), document.querySelector('#contact-button'));
     });

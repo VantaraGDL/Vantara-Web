@@ -1,7 +1,16 @@
 const WHATSAPP_NUMBER = '523315012267';
 
+function priceLines(row,money) {
+    if(row.individualSaleApplied)return [
+        `Precio original: ${money(row.originalPrice)}`,
+        `Descuento: ${row.discountPercent}%`,
+        `Precio final: ${money(row.price)}`
+    ];
+    return [`Precio unitario: ${row.price === null ? 'Por confirmar' : money(row.price)}`];
+}
+
 export function buildOrderMessage(rows, calculation, money) {
-    const lines = rows.map(row => `${row.name}\nTalla: ${row.size}\nCantidad: ${row.quantity}\nPrecio unitario: ${row.price === null ? 'Por confirmar' : money(row.price)}`);
+    const lines = rows.map(row => `${row.name}\nTalla: ${row.size}\nCantidad: ${row.quantity}\n${priceLines(row,money).join('\n')}`);
     return `Hola, quiero realizar el siguiente pedido:\n\n${lines.join('\n\n')}\n\n${calculation.completePrice ? 'Subtotal' : 'Subtotal conocido'}: ${money(calculation.subtotal)}\n${calculation.discount ? 'Descuento por conjunto: −' + money(calculation.discount) + '\n' : ''}Total final: ${calculation.completePrice ? money(calculation.total) : 'Por confirmar'}`;
 }
 
@@ -44,7 +53,7 @@ export function createOrderConfirmation(money) {
             const card = append(items, 'article', '');
             append(card, 'h3', row.name);
             append(card, 'p', `Talla: ${row.size} · Cantidad: ${row.quantity}`);
-            append(card, 'p', `Precio unitario: ${row.price === null ? 'Por confirmar' : money(row.price)}`);
+            for (const line of priceLines(row,money)) append(card, 'p', line);
         }
         const totals = dialog.querySelector('.confirmation-totals'); totals.replaceChildren();
         append(totals, 'p', `${calculation.completePrice ? 'Subtotal' : 'Subtotal conocido'}: ${money(calculation.subtotal)}`);

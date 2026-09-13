@@ -1,3 +1,4 @@
+import {mountSaleFields} from './sale-fields.js?v=sales-1';
 import {loadSizes} from './sizes.js?v=admin-5';
 import {mountVariants} from './variant-editor.js?v=admin-5';
 import {mountMedia} from './media.js?v=admin-5';
@@ -35,6 +36,7 @@ async function boot(){
    const fields=['name','model','color','brand_id','category_id','price','material','description','collection_id'];
    for(const key of fields)form.elements[key].value=original[key]??'';
    for(const key of ['featured','new_release'])form.elements[key].checked=original[key];
+   const saleFields=mountSaleFields(form,original);
    const sizes=await loadSizes(client);
    const variantEditor=mountVariants($('#variants'),original,{busy:()=>saving,changed:()=>{dirty=true;say('Cambios pendientes de guardar.');}},sizes);
    form.addEventListener('input',()=>{dirty=true;});form.hidden=false;form.querySelector('fieldset').disabled=original.deletion_pending;
@@ -42,6 +44,7 @@ async function boot(){
     const patch={};for(const key of fields)patch[key]=form.elements[key].value.trim()||null;
     if(!patch.name)throw new Error('El nombre es obligatorio.');patch.price=numberOrNull(form.elements.price.value);
     patch.featured=form.elements.featured.checked;patch.new_release=form.elements.new_release.checked;
+    Object.assign(patch,saleFields());
     const rows=variantEditor.values();
     if(!rows.some(v=>!v.removed))throw new Error('Conserva al menos una talla.');
     const variants=rows.map(v=>v.removed?{id:v.id,delete:true}:{...(v.id?{id:v.id}:{size:v.size}),stock:numberOrNull(String(v.value),true)});
