@@ -6,8 +6,9 @@
 <form id="size-form"><fieldset><legend id="form-title">Crear talla</legend>
 <label for="code">Código</label><input id="code" required maxlength="40">
 <label for="label">Nombre</label><input id="label" required maxlength="120">
+<label for="size-type">Tipo</label><select id="size-type"><option value="clothing">Ropa</option><option value="footwear">Calzado</option></select><p>El tipo se fija al crear la talla. Calzado admite códigos numéricos como 24 o 24.5.</p>
 <label for="sort">Orden</label><input id="sort" type="number" min="0" max="2147483647" step="1" required>
 <label class="check"><input id="active" type="checkbox" checked> Activa</label>
 <button type="submit">Guardar talla</button><button type="button" id="cancel">Cancelar edición</button>
 </fieldset></form><h2>Tallas actuales</h2><div id="sizes-list" class="product-list"></div></section>
-<noscript>Activa JavaScript para acceder.</noscript></main><script type="module" src="./js/sizes-admin.js?v=admin-5"></script></body></html>
+<noscript>Activa JavaScript para acceder.</noscript></main><script type="module" src="./js/sizes-admin.js?v=footwear-1"></script></body></html>

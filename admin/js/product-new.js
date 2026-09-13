@@ -1,6 +1,6 @@
 import {mountSaleFields} from './sale-fields.js?v=sales-1';
-import {loadSizes} from './sizes.js?v=admin-5';
-import {mountTaxonomyCreation} from './taxonomy-create.js?v=admin-3';
+import {loadSizes} from './sizes.js?v=footwear-1';
+import {mountTaxonomyCreation} from './taxonomy-create.js?v=footwear-1';
 import {projectUrl,publishableKey} from './config.js';
 import {requireAdmin} from './auth.js';
 import {allRows,numberOrNull} from './products-data.js?v=admin-4';
@@ -8,7 +8,7 @@ const form=document.querySelector('#creator'),content=document.querySelector('#c
 let dirty=false,busy=false;
 window.addEventListener('beforeunload',e=>{if(dirty||busy){e.preventDefault();e.returnValue='';}});
 const say=t=>message.textContent=t;
-function options(key,rows,empty){const select=form.elements[key];select.replaceChildren();if(empty){const o=new Option(empty,'');select.add(o);}for(const row of rows)select.add(new Option(row.name,row.id));}
+function options(key,rows,empty){const select=form.elements[key];select.replaceChildren();if(empty){const o=new Option(empty,'');select.add(o);}for(const row of rows){const option=new Option(row.name,row.id);if(row.size_type)option.dataset.sizeType=row.size_type;select.add(option);}}
 async function boot(){try{
  const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/+esm');
  const client=createClient(projectUrl,publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'vantara-admin-session'}});
@@ -17,18 +17,20 @@ async function boot(){try{
  client.auth.onAuthStateChange(e=>{if(e==='SIGNED_OUT'){content.hidden=true;say('Sesión cerrada. Inicia sesión para continuar.');}});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)guard().catch(e=>say(e.message));});
  window.addEventListener('pageshow',e=>{if(e.persisted)guard().catch(e=>say(e.message));});
- const [brands,categories,collections]=await Promise.all(['brands','categories','collections'].map(t=>allRows(client,t,'id,name')));
+ const [brands,categories,collections]=await Promise.all(['brands','categories','collections'].map(t=>allRows(client,t,t==='categories'?'id,name,size_type':'id,name')));
  options('brand_id',brands,'Selecciona marca');options('category_id',categories,'Selecciona categoría');options('collection_id',collections,'Sin colección');
  form.elements.brand_id.required=true;form.elements.category_id.required=true;
  mountTaxonomyCreation(client,form,{busy:()=>busy,lock:value=>{busy=value;form.querySelector('fieldset').disabled=value;},changed:()=>dirty=true,say});
  const saleFields=mountSaleFields(form);
- const {options:SIZES,sizeLabel}=await loadSizes(client);
+ const sizeCatalog=await loadSizes(client),{sizeLabel}=sizeCatalog;
+ const sizeType=()=>form.elements.category_id.selectedOptions[0]?.dataset.sizeType||'clothing';
  const values=new Map(),chosen=new Set();
  function variants(){const box=document.querySelector('#variants');box.replaceChildren();
-  const sizes=SIZES.map(([size])=>size);
+  const sizes=sizeCatalog.optionsFor(sizeType()).map(([size])=>size);
   for(const size of sizes){const label=document.createElement('label');label.className='check';const check=document.createElement('input');check.type='checkbox';check.checked=chosen.has(size);check.dataset.size=size;label.append(check,document.createTextNode(sizeLabel(size)));const input=document.createElement('input');input.type='number';input.min='0';input.max='2147483647';input.step='1';input.placeholder='Pendiente';input.value=values.get(size)??'';input.setAttribute('aria-label','Stock '+size);input.disabled=!check.checked;check.addEventListener('change',()=>{input.disabled=!check.checked;if(check.checked)chosen.add(size);else chosen.delete(size);variants();[...box.querySelectorAll('[data-size]')].find(c=>c.dataset.size===size)?.focus();});input.addEventListener('input',()=>values.set(size,input.value));input.dataset.stock=size;box.append(label,input);}
  }
 
+ form.elements.category_id.addEventListener('change',()=>{for(const size of chosen)if(sizeCatalog.incompatible([{size}],sizeType()).length)chosen.delete(size);variants();dirty=true;});
  form.addEventListener('input',()=>dirty=true);variants();form.hidden=false;say('');
  form.addEventListener('submit',async e=>{e.preventDefault();if(busy)return;
   try{const product={};for(const key of ['name','model','color','brand_id','category_id','material','description','collection_id'])product[key]=form.elements[key].value.trim()||null;

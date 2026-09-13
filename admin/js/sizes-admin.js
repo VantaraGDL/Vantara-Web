@@ -1,11 +1,11 @@
 import {projectUrl,publishableKey} from './config.js';
 import {requireAdmin} from './auth.js';
-import {loadSizes} from './sizes.js?v=admin-5';
+import {loadSizes} from './sizes.js?v=footwear-1';
 const $=id=>document.getElementById(id),form=$('size-form');
 let editing=null,busy=false,dirty=false;
 const say=text=>$('message').textContent=text;
 window.addEventListener('beforeunload',e=>{if(dirty||busy){e.preventDefault();e.returnValue='';}});
-function reset(){editing=null;form.reset();$('code').readOnly=false;$('form-title').textContent='Crear talla';dirty=false;}
+function reset(){editing=null;form.reset();$('code').readOnly=false;$('size-type').disabled=false;$('form-title').textContent='Crear talla';dirty=false;}
 async function boot(){try{
  const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/+esm');
  const client=createClient(projectUrl,publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'vantara-admin-session'}});
@@ -19,9 +19,9 @@ async function boot(){try{
    for(const row of sizes.sortSizes(sizes.catalog.map(v=>({...v,size:v.code})))){
      const card=document.createElement('article');card.className='card';
      const title=document.createElement('h3');title.textContent=sizes.sizeLabel(row.code);
-     const info=document.createElement('p');info.textContent='Orden '+row.sort_order+' · '+(row.active?'Activa':'Inactiva');
+     const info=document.createElement('p');info.textContent=(row.size_type==='footwear'?'Calzado':'Ropa')+' · Orden '+row.sort_order+' · '+(row.active?'Activa':'Inactiva');
      const edit=document.createElement('button');edit.type='button';edit.textContent='Editar / activar o desactivar';
-     edit.addEventListener('click',()=>{if(busy)return;if(dirty&&!confirm('¿Descartar los cambios del formulario?'))return;editing=row.id;$('code').value=row.code;$('code').readOnly=true;$('label').value=row.label;$('sort').value=row.sort_order;$('active').checked=row.active;$('form-title').textContent='Editar talla';dirty=false;$('label').focus();});
+     edit.addEventListener('click',()=>{if(busy)return;if(dirty&&!confirm('¿Descartar los cambios del formulario?'))return;editing=row.id;$('size-type').value=row.size_type;$('size-type').disabled=true;$('code').value=row.code;$('code').readOnly=true;$('label').value=row.label;$('sort').value=row.sort_order;$('active').checked=row.active;$('form-title').textContent='Editar talla';dirty=false;$('label').focus();});
      card.append(title,info,edit);$('sizes-list').append(card);
    }
  }
@@ -31,9 +31,10 @@ async function boot(){try{
    try{
      const code=$('code').value.trim().replace(/\s+/g,' '),label=$('label').value.trim(),order=Number($('sort').value);
      if(!code||!label||!$('sort').value.trim()||!Number.isInteger(order)||order<0||order>2147483647)throw new Error('Completa código, nombre y un orden entero no negativo.');
+     if($('size-type').value==='footwear'&&!/^[1-9][0-9]*([.][0-9]+)?$/.test(code))throw new Error('Calzado requiere un código numérico, por ejemplo 24 o 24.5.');
      busy=true;form.querySelector('fieldset').disabled=true;say('Guardando talla…');
      if(!await guard())return;
-     const {error}=await client.rpc('save_catalog_size',{p_id:editing,p_code:code,p_label:label,p_sort_order:order,p_active:$('active').checked});
+     const {error}=await client.rpc('save_catalog_size',{p_id:editing,p_code:code,p_label:label,p_sort_order:order,p_active:$('active').checked,p_size_type:$('size-type').value});
      if(error)throw new Error(error.code==='23505'?'Ya existe una talla con ese código.':error.message);
      reset();
      try{await render();say('Talla guardada.');}catch{say('Talla guardada, pero no se pudo actualizar la lista. Recarga para verla.');}

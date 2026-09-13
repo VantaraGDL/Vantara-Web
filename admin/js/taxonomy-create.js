@@ -37,7 +37,7 @@ export function mountTaxonomyCreation(client,productForm,controls) {
             const {data,error}=await client.rpc('create_catalog_taxonomy',{p_kind:kind,p_name:name.value.trim(),p_slug:slug.value,p_options:options});
             if(error)throw new Error(error.code==='23505'?'Ya existe una entrada con ese nombre o slug. Selecciónala en la lista.':error.message);
             if(!data?.id)throw new Error('No se recibió confirmación. Revisa el selector antes de reintentar.');
-            const option=new Option(data.name,data.id);target.add(option,target.options[target.options.length-1]);target.value=data.id;
+            const option=new Option(data.name,data.id);if(kind==='categories')option.dataset.sizeType=data.size_type;target.add(option,target.options[target.options.length-1]);target.value=data.id;
             target.dispatchEvent(new Event('change',{bubbles:true}));controls.changed();close();controls.say('Entrada creada y seleccionada. Aún debes guardar el producto.');
         }catch(error){status.textContent=error.message||'No se confirmó la creación. Recarga para comprobar si se guardó antes de reintentar.';}
         finally{controls.lock(false);form.querySelector('fieldset').disabled=false;}

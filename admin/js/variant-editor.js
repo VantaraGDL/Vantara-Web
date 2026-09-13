@@ -1,6 +1,6 @@
 
 
-export function mountVariants(container,original,{busy,changed},sizes) {
+export function mountVariants(container,original,{busy,changed,sizeType},sizes) {
     const {availableSizes,sortSizes,sizeLabel}=sizes;
     let rows=[];
     const label=document.createElement('label');label.textContent='Añadir talla';label.htmlFor='add-size';
@@ -12,7 +12,7 @@ export function mountVariants(container,original,{busy,changed},sizes) {
         for(const row of sortSizes(rows)) {
             const group=document.createElement('div');group.className='variant-row'+(row.removed?' variant-removed':'');
             const label=document.createElement('label');label.htmlFor='variant-stock-'+row.size;
-            label.textContent=sizeLabel(row.size)+(row.removed?' — Pendiente de eliminar':row.id?'':' — Por guardar');
+            label.textContent=sizeLabel(row.size)+(sizes.incompatible([row],sizeType()).length?' — Incompatible con categoría':'')+(row.removed?' — Pendiente de eliminar':row.id?'':' — Por guardar');
             const input=document.createElement('input');Object.assign(input,{id:label.htmlFor,type:'number',min:'0',max:'2147483647',step:'1',placeholder:'Pendiente',value:row.value,disabled:row.removed});
             input.addEventListener('input',()=>{row.value=input.value;changed();});
             const button=document.createElement('button');button.type='button';
@@ -32,12 +32,12 @@ export function mountVariants(container,original,{busy,changed},sizes) {
         }
         select.replaceChildren();
         // Reserved until saved: use Undo instead of adding the same size twice.
-        for(const [size] of availableSizes(rows))select.add(new Option(sizeLabel(size),size));
+        for(const [size] of availableSizes(rows,sizeType()))select.add(new Option(sizeLabel(size),size));
         select.disabled=add.disabled=!select.options.length;
         if(focusSize){const input=document.getElementById('variant-stock-'+focusSize);(focusButton?input?.nextElementSibling:input)?.focus();}
     }
     add.addEventListener('click',()=>{if(busy()||!select.value)return;const size=select.value;rows.push({size,value:'',removed:false});changed();render(size);});
     function reset(){rows=original.product_variants.map(v=>({...v,value:v.stock??'',removed:false}));render();}
     reset();
-    return {reset,values:()=>sortSizes(rows).map(v=>({...v}))};
+    return {reset,refresh:()=>render(),values:()=>sortSizes(rows).map(v=>({...v}))};
 }

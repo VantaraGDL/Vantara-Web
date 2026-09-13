@@ -1,6 +1,6 @@
 import {mountSaleFields} from './sale-fields.js?v=sales-1';
-import {loadSizes} from './sizes.js?v=admin-5';
-import {mountVariants} from './variant-editor.js?v=admin-5';
+import {loadSizes} from './sizes.js?v=footwear-1';
+import {mountVariants} from './variant-editor.js?v=footwear-1';
 import {mountMedia} from './media.js?v=admin-5';
 import {projectUrl,publishableKey} from './config.js';
 import {requireAdmin} from './auth.js';
@@ -20,7 +20,7 @@ async function boot(){
   client.auth.onAuthStateChange(e=>{if(e==='SIGNED_OUT'){content.hidden=true;say('Sesión cerrada. Vuelve a iniciar sesión.');}});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)authorize().catch(e=>say(e.message));});
   window.addEventListener('pageshow',e=>{if(e.persisted)authorize().catch(e=>say(e.message));});
-  const [brands,categories,collections]=await Promise.all(['brands','categories','collections'].map(t=>allRows(client,t,'id,name')));
+  const [brands,categories,collections]=await Promise.all(['brands','categories','collections'].map(t=>allRows(client,t,t==='categories'?'id,name,size_type':'id,name')));
   if($('#list')){
    const rows=await allRows(client,'products','id,name,model,brand_id,category_id,price,published,featured,product_variants(id,size,stock)');
    options($('#brand'),brands,'Todas las marcas');options($('#category'),categories,'Todas las categorías');
@@ -38,7 +38,9 @@ async function boot(){
    for(const key of ['featured','new_release'])form.elements[key].checked=original[key];
    const saleFields=mountSaleFields(form,original);
    const sizes=await loadSizes(client);
-   const variantEditor=mountVariants($('#variants'),original,{busy:()=>saving,changed:()=>{dirty=true;say('Cambios pendientes de guardar.');}},sizes);
+   const sizeType=()=>categories.find(c=>c.id===form.elements.category_id.value)?.size_type;
+   const variantEditor=mountVariants($('#variants'),original,{sizeType,busy:()=>saving,changed:()=>{dirty=true;say('Cambios pendientes de guardar.');}},sizes);
+   form.elements.category_id.addEventListener('change',()=>{dirty=true;variantEditor.refresh();const incompatible=sizes.incompatible(variantEditor.values(),sizeType());say(incompatible.length?'Tallas incompatibles: '+incompatible.join(', ')+'. Elimínalas explícitamente o conserva la categoría anterior.':'Cambios pendientes de guardar.');});
    form.addEventListener('input',()=>{dirty=true;});form.hidden=false;form.querySelector('fieldset').disabled=original.deletion_pending;
    form.addEventListener('submit',async e=>{e.preventDefault();if(saving)return;try{
     const patch={};for(const key of fields)patch[key]=form.elements[key].value.trim()||null;
@@ -46,6 +48,7 @@ async function boot(){
     patch.featured=form.elements.featured.checked;patch.new_release=form.elements.new_release.checked;
     Object.assign(patch,saleFields());
     const rows=variantEditor.values();
+    const incompatible=sizes.incompatible(rows,sizeType());if(incompatible.length)throw new Error('Tallas incompatibles con la categoría: '+incompatible.join(', ')+'. Elimínalas explícitamente o conserva la categoría anterior.');
     if(!rows.some(v=>!v.removed))throw new Error('Conserva al menos una talla.');
     const variants=rows.map(v=>v.removed?{id:v.id,delete:true}:{...(v.id?{id:v.id}:{size:v.size}),stock:numberOrNull(String(v.value),true)});
     saving=true;form.querySelector('fieldset').disabled=true;form.setAttribute('aria-busy','true');say('Guardando…');
