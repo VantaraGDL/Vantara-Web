@@ -36,6 +36,7 @@ export function knownPrice(item) {return item.price!==null && item.price!==undef
 export function calculateOrder(selected,selection) {
     const completePrice=selected.every(knownPrice);
     const prices=getOrderPrices(selected,selection);
+    const originalSubtotal=selected.reduce((sum,p)=>sum+(getOriginalPrice(p)??0)*selection.get(p.id).quantity,0);
     const subtotal=selected.reduce((sum,p)=>sum+(prices.get(p.id)??0)*selection.get(p.id).quantity,0);
     const groups=new Map();
     for(const p of selected) {
@@ -45,7 +46,7 @@ export function calculateOrder(selected,selection) {
     }
     const discount=completePrice ? Math.min(subtotal,[...groups.values()].reduce((sum,{pieces,rule})=>
         sum+(rule?.enabled && pieces>=rule.minimumPieces ? rule.amount : 0),0)) : 0;
-    return {completePrice,subtotal,discount,total:subtotal-discount};
+    return {completePrice,subtotal,discount,total:subtotal-discount,originalSubtotal,individualDiscountTotal:originalSubtotal-subtotal,effectiveSubtotal:subtotal,collectionDiscountTotal:discount,finalTotal:subtotal-discount};
 }
 
 export function getOriginalPrice(p) {return knownPrice(p)?Number(p.price):null;}
@@ -55,20 +56,25 @@ export function getProductPrice(p) {
  return original===null?null:isProductOnSale(p)?Math.round(original*(100-p.discountPercent)/100):original;
 }
 export const getDiscountedPrice=getProductPrice;
-// Qualifying collections retain their original-price calculation; offers never stack.
+// Individual offers remain applied before the separate collection discount.
 export function getOrderPricing(selected,selection) {
- const groups=new Map();
- for(const p of selected)if(p.collection)groups.set(p.collection,(groups.get(p.collection)||0)+selection.get(p.id).quantity);
- const complete=selected.every(knownPrice);
  return new Map(selected.map(p=>{
-  const collectionApplied=complete && p.collectionDiscount?.enabled && groups.get(p.collection)>=p.collectionDiscount.minimumPieces;
   const originalPrice=getOriginalPrice(p);
-  const individualSaleApplied=!collectionApplied && originalPrice!==null && isProductOnSale(p);
-  return [p.id,{price:collectionApplied?originalPrice:getProductPrice(p),originalPrice,
+  const individualSaleApplied=originalPrice!==null && isProductOnSale(p);
+  return [p.id,{price:getProductPrice(p),originalPrice,
    discountPercent:individualSaleApplied?p.discountPercent:null,individualSaleApplied}];
  }));
 }
 
 export function getOrderPrices(selected,selection) {
  return new Map([...getOrderPricing(selected,selection)].map(([id,pricing])=>[id,pricing.price]));
+}
+
+export function orderSummaryLines(calculation,money) {
+ const c=calculation;
+ return [`${c.completePrice?'Subtotal original':'Subtotal original conocido'}: ${money(c.originalSubtotal)}`,
+ ...(c.individualDiscountTotal ? ['Descuento en productos: −'+money(c.individualDiscountTotal)] : []),
+ `Subtotal después de ofertas: ${money(c.effectiveSubtotal)}`,
+ ...(c.collectionDiscountTotal ? ['Descuento de colección: −'+money(c.collectionDiscountTotal)] : []),
+ 'Total final: '+(c.completePrice?money(c.finalTotal):'Por confirmar')];
 }

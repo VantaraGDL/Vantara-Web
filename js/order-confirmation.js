@@ -1,3 +1,12 @@
+// Presentation only: reuse the calculated amounts without recalculating discounts.
+function confirmationSummaryLines(rows, calculation, money) {
+    const label = rows.length === 1 ? 'Subtotal' : 'Subtotal del conjunto';
+    return [
+        `${label}${calculation.completePrice ? '' : ' conocido'}: ${money(calculation.effectiveSubtotal)}`,
+        ...(calculation.collectionDiscountTotal > 0 ? ['Descuento de colección: −' + money(calculation.collectionDiscountTotal)] : []),
+        'Total final: ' + (calculation.completePrice ? money(calculation.finalTotal) : 'Por confirmar')
+    ];
+}
 const WHATSAPP_NUMBER = '523315012267';
 
 function priceLines(row,money) {
@@ -11,10 +20,10 @@ function priceLines(row,money) {
 
 export function buildOrderMessage(rows, calculation, money) {
     const lines = rows.map(row => `${row.name}\nTalla: ${row.size}\nCantidad: ${row.quantity}\n${priceLines(row,money).join('\n')}`);
-    return `Hola, quiero realizar el siguiente pedido:\n\n${lines.join('\n\n')}\n\n${calculation.completePrice ? 'Subtotal' : 'Subtotal conocido'}: ${money(calculation.subtotal)}\n${calculation.discount ? 'Descuento por conjunto: −' + money(calculation.discount) + '\n' : ''}Total final: ${calculation.completePrice ? money(calculation.total) : 'Por confirmar'}`;
+    return `Hola, quiero realizar el siguiente pedido:\n\n${lines.join('\n\n')}\n\n${confirmationSummaryLines(rows,calculation,money).join('\n')}`;
 }
 
-export function createOrderConfirmation(money) {
+export function createOrderConfirmation(money, options = {}) {
     const dialog = document.createElement('dialog');
     dialog.className = 'order-confirmation';
     dialog.setAttribute('role', 'dialog');
@@ -32,9 +41,12 @@ export function createOrderConfirmation(money) {
         document.body.classList.remove('order-confirmation-open');
         opener?.focus({preventScroll:true});
     });
-    confirm.addEventListener('click', () => {
+    confirm.addEventListener('click', async () => {
         if (submitted || !dialog.open) return;
         submitted = true; confirm.disabled = true;
+        try { await options.beforeConfirm?.(); }
+        catch(e){submitted=false;confirm.disabled=false;dialog.querySelector('.confirmation-status').textContent=e.message||'No se pudo validar el pedido. Reintenta.';return;}
+        if(!dialog.open){submitted=false;confirm.disabled=false;return;}
         cooldownUntil = Date.now() + 1500;
         const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
         // Same-tab navigation avoids popup blockers and multiple WhatsApp windows.
@@ -42,6 +54,13 @@ export function createOrderConfirmation(money) {
         catch {
             submitted = false; confirm.disabled = false;
             dialog.querySelector('.confirmation-status').textContent = 'No se pudo abrir WhatsApp. Intenta confirmar de nuevo.';
+            return;
+        }
+        try { options.onWhatsAppOpened?.(); }
+        catch {
+            submitted = false; confirm.disabled = false;
+            dialog.querySelector('.confirmation-status').textContent = 'Se abrió WhatsApp, pero no se pudo limpiar el carrito.';
+            window.alert('Se abrió WhatsApp, pero no se pudo vaciar el carrito. Elimínalo manualmente.');
         }
     });
     return (rows, calculation, button) => {
@@ -56,9 +75,8 @@ export function createOrderConfirmation(money) {
             for (const line of priceLines(row,money)) append(card, 'p', line);
         }
         const totals = dialog.querySelector('.confirmation-totals'); totals.replaceChildren();
-        append(totals, 'p', `${calculation.completePrice ? 'Subtotal' : 'Subtotal conocido'}: ${money(calculation.subtotal)}`);
-        if (calculation.discount) append(totals, 'p', 'Descuento por conjunto: −' + money(calculation.discount));
-        append(totals, 'strong', 'Total final: ' + (calculation.completePrice ? money(calculation.total) : 'Por confirmar'));
+        const summaryLines=confirmationSummaryLines(rows,calculation,money);
+        summaryLines.forEach((line,index)=>append(totals,index===summaryLines.length-1?'strong':'p',line));
         dialog.querySelector('.confirmation-status').textContent = '';
         dialog.showModal(); document.body.classList.add('order-confirmation-open'); cancel.focus();
     };

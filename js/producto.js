@@ -1,7 +1,8 @@
-import {createOrderConfirmation} from './order-confirmation.js?v=badges-order-2';
+import {addCartItems} from './cart.js?v=collection-cart-2';
+import {createOrderConfirmation} from './order-confirmation.js?v=summary-1';
 import {catalogApi} from './catalog-api.js?v=sales-1';
-import {escapeHTML,getOrderPrices,getOrderPricing,isProductOnSale,getPublicVariants,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=badges-order-2';
-import {getProductImages,createProductCard,renderProductPrice} from './product-ui.js?v=badges-order-2';
+import {escapeHTML,getOrderPrices,getOrderPricing,isProductOnSale,getPublicVariants,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=collection-cart-2';
+import {getProductImages,createProductCard,renderProductPrice} from './product-ui.js?v=collection-cart-2';
 let products=[],product;
 const productDetail =
     document.querySelector("#product-detail");
@@ -174,6 +175,8 @@ function renderProduct(product) {
             </button>
 
 
+            <button type="button" id="add-cart" class="product-action">Agregar al carrito</button>
+            <p id="cart-feedback" role="status" aria-live="polite"></p>
         </aside>
     `;
 
@@ -191,6 +194,11 @@ function renderProduct(product) {
     });
     if (orderSelection.get(product.id).size) document.querySelector('#stock-status').textContent = 'Talla seleccionada: ' + orderSelection.get(product.id).size;
 
+    document.querySelector('#add-cart').addEventListener('click',()=>{
+        const feedback=document.querySelector('#cart-feedback');
+        try{const selected=products.filter(p=>orderSelection.has(p.id));addCartItems(selected.map(p=>({product:p,...orderSelection.get(p.id)})));feedback.textContent=selected.length>1?'Conjunto agregado al carrito':'Producto agregado al carrito';}
+        catch(e){feedback.textContent=e.message;document.querySelector(`[data-sizes-for="${e.productId}"] .size-button:not(:disabled)`)?.focus();}
+    });
     setupContactButton(product);
     setupGallery();
     setupImageViewer();
@@ -214,7 +222,7 @@ function renderCollection(current) {
     const title = current.collectionName;
     return `<section class="outfit" aria-labelledby="outfit-title">
         <h2 id="outfit-title">Arma tu conjunto — ${escapeHTML(title)}</h2>
-        <p class="outfit-hint">Las ofertas individuales no se acumulan con el descuento por conjunto. Al alcanzar su mínimo, se usan los precios originales y el descuento de colección. </p>
+        <p class="outfit-hint">Las ofertas individuales se aplican primero. Al alcanzar el mínimo de la colección, se añade su descuento al subtotal después de ofertas. </p>
         <p class="outfit-hint">Agrega otras prendas si quieres completar tu conjunto. El total incluye el producto actual.</p>
         <div class="outfit-list">${members.map((item, index) => `
             <article class="outfit-card" data-outfit-id="${item.id}" data-original-order="${index}">
@@ -235,12 +243,10 @@ function renderCollection(current) {
 
 function updateOrderSummary() {
     const selected = products.filter(p => orderSelection.has(p.id));
-    const prices = getOrderPrices(selected,orderSelection);
     document.querySelectorAll('[data-order-price]').forEach(element => {
         const item = products.find(p => p.id === Number(element.dataset.orderPrice));
-        const collectionPricing = prices.has(item.id) && isProductOnSale(item) && prices.get(item.id) === Number(item.price);
-        element.innerHTML = renderProductPrice(collectionPricing ? {...item,onSale:false} : item)
-            + (collectionPricing ? ' <small>Precio base para descuento por conjunto</small>' : item.id === product.id && isProductOnSale(item) ? ` <span class="product-sale-label">OFERTA -${item.discountPercent}%</span>` : '');
+        element.innerHTML = renderProductPrice(item)
+            + (item.id === product.id && isProductOnSale(item) ? ` <span class="product-sale-label">OFERTA -${item.discountPercent}%</span>` : '');
     });
     const pieces = selected.reduce((sum, p) => sum + orderSelection.get(p.id).quantity, 0);
     const valid = selected.every(p => Number.isSafeInteger(orderSelection.get(p.id).quantity) && orderSelection.get(p.id).quantity > 0 && orderSelection.get(p.id).quantity <= quantityLimit(p, orderSelection.get(p.id).size));
@@ -331,7 +337,7 @@ function setupContactButton() {
         const orderPricing = getOrderPricing(selected,orderSelection);
         const rows = selected.map(item => {
             const { size, quantity } = orderSelection.get(item.id);
-            return {name: item.name || item.model, size: size || item.variants?.[0]?.size || 'No requiere talla', quantity, ...orderPricing.get(item.id)};
+            return {name: item.name || item.model, size: size || item.variants?.[0]?.size || 'No requiere talla', quantity, ...orderPricing.get(item.id), lineSubtotal:orderPricing.get(item.id).price===null?null:orderPricing.get(item.id).price*quantity};
         });
         openConfirmation(rows, calculateOrder(selected), document.querySelector('#contact-button'));
     });

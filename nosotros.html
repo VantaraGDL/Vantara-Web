@@ -13,7 +13,7 @@
 
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/nosotros.css">
-    <link rel="stylesheet" href="css/public-theme.css?v=motion-2">
+    <link rel="stylesheet" href="css/public-theme.css?v=cart-1">
 </head>
 
 <body class="public-page nosotros-page">
@@ -35,7 +35,7 @@
     </nav>
 
 
-    <div class="header-tools"><a href="catalogo.html" aria-label="Buscar en el catálogo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg></a><a href="contacto.html" aria-label="Contactar a Vant’ara"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H9l-5 4V4Z"/></svg></a></div>
+    <div class="header-tools"><a href="carrito.html" class="cart-link" data-cart-link aria-label="Carrito"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l1 14H4L5 7Z M9 7V5a3 3 0 0 1 6 0v2"/></svg><span data-cart-count aria-live="polite" aria-atomic="true">0</span></a><a href="catalogo.html" aria-label="Buscar en el catálogo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg></a><a href="contacto.html" aria-label="Contactar a Vant’ara"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H9l-5 4V4Z"/></svg></a></div>
     <button
         class="menu-toggle"
         id="menu-toggle"
@@ -183,7 +183,7 @@
     </div>
 
 
-    <nav class="mobile-menu-links" aria-label="Principal móvil">
+    <nav class="mobile-menu-links" aria-label="Principal móvil"><a href="carrito.html" data-cart-link aria-label="Carrito">Carrito (<span data-cart-count>0</span>)</a>
 
         <a href="index.html">
             Inicio
@@ -223,5 +223,6 @@
     <script src="js/menu.js"></script>
     
     <script type="module" src="js/motion.js?v=motion-2"></script>
+<script type="module" src="js/cart-header.js?v=collection-cart-2"></script>
 </body>
 </html>

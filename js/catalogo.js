@@ -1,6 +1,6 @@
 import {catalogApi} from './catalog-api.js?v=sales-1';
-import {getTotalStock,getProductPrice} from './catalog-logic.js?v=badges-order-2';
-import {createProductCard} from './product-ui.js?v=badges-order-2';
+import {getTotalStock,getProductPrice} from './catalog-logic.js?v=collection-cart-2';
+import {createProductCard} from './product-ui.js?v=collection-cart-2';
 let products=[];
 let loadError=false;
 const catalogContainer =

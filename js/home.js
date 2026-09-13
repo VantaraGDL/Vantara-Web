@@ -1,6 +1,6 @@
 import {renderNewReleases} from './new-releases.js?v=releases-2';
 import {catalogApi} from './catalog-api.js?v=sales-1';
-import {createProductCard} from './product-ui.js?v=badges-order-2';
+import {createProductCard} from './product-ui.js?v=collection-cart-2';
 const container=document.querySelector('#featured-products');
 const status=document.createElement('p');
 status.setAttribute('role','status');status.textContent='Cargando destacados…';container.before(status);

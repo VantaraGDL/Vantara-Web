@@ -1,4 +1,4 @@
-import {escapeHTML,getProductBadges,getProductPrice,isProductOnSale,getOriginalPrice} from './catalog-logic.js?v=badges-order-2';
+import {escapeHTML,getProductBadges,getProductPrice,isProductOnSale,getOriginalPrice} from './catalog-logic.js?v=collection-cart-2';
 export function getProductImages(product) {
 
     if (
