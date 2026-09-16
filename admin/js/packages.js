@@ -2,7 +2,7 @@ import { projectUrl, publishableKey } from './config.js';
 import { requireAdmin } from './auth.js';
 import { allRows } from './products-data.js?v=admin-4';
 import { validateImage } from './media-data.js?v=packages-1';
-import { PACKAGE_BUCKET, packageRpc, imageAction, completePackageUpload, uploadPackageImage, packageAssets, cleanupPackageImages, reconcileAssignedPackageImages } from './packages-data.js?v=packages-images-4';
+import { PACKAGE_BUCKET, packageRpc, imageAction, completePackageUpload, uploadPackageImage, packageAssets, cleanupPackageImages, reconcileAssignedPackageImages } from './packages-data.js?v=package-gallery-1';
 
 const $ = id => document.getElementById(id);
 const form = $('package-form');
@@ -26,8 +26,9 @@ function link(text, href) {
 }
 
 let client, busy = false, dirty = false, id = null, products = [], selected = [];
-let imagePath = null, savedImagePath = null, file = null, slugEdited = false;
-let previewUrl = null, previewSerial = 0;
+let gallery = [], savedPaths = new Set(), slugEdited = false;
+let previewSerial = 0;
+const previews = new Map();
 const listUrls = [];
 function markDirty() { dirty = true; message('Cambios pendientes de guardar.'); }
 function setBusy(value) {
@@ -55,24 +56,54 @@ window.addEventListener('beforeunload', event => {
 
 async function preview() {
   const serial = ++previewSerial;
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-  previewUrl = null;
-  $('package-preview').hidden = true;
-  $('preview-status').textContent = '';
-  if (!file && !imagePath) return;
-  try {
-    let blob = file;
-    if (!blob) {
-      const result = await client.storage.from(PACKAGE_BUCKET).download(imagePath);
-      if (result.error) throw result.error;
-      blob = result.data;
-    }
-    if (serial !== previewSerial) return;
-    previewUrl = URL.createObjectURL(blob);
-    $('package-preview').src = previewUrl;
-    $('package-preview').hidden = false;
-  } catch { if (serial === previewSerial) $('preview-status').textContent = 'No se pudo cargar la vista previa. Reintenta al actualizar la página.'; }
+  const panel = $('package-gallery'); panel.replaceChildren();
+  if (!gallery.length) { panel.append(node('p', 'El paquete no tiene imágenes.')); return; }
+  for (const [index, entry] of gallery.entries()) {
+    const card = node('div', undefined, 'package-gallery-card');
+    const img = node('img'); img.alt = 'Imagen ' + (index + 1) + ' del paquete'; card.append(img);
+    const label = node('p', entry.primary ? 'Principal' : 'Imagen ' + (index + 1)); card.append(label);
+    const actions = node('div', undefined, 'package-actions');
+    const move = step => {
+      if (busy) return;
+      [gallery[index], gallery[index + step]] = [gallery[index + step], gallery[index]];
+      markDirty(); preview().then(() => panel.children[index + step]?.querySelector('button:not(:disabled)')?.focus());
+    };
+    const up = button('↑', () => move(-1)); up.disabled = index === 0; up.setAttribute('aria-label', 'Subir imagen ' + (index + 1));
+    const down = button('↓', () => move(1)); down.disabled = index === gallery.length - 1; down.setAttribute('aria-label', 'Bajar imagen ' + (index + 1));
+    const primary = button('Usar como principal', () => {
+      if (busy) return;
+      gallery.forEach(item => { item.primary = item === entry; }); markDirty(); preview();
+    }); primary.disabled = entry.primary;
+    const remove = button('Quitar al guardar', () => {
+      if (busy || !confirm('¿Quitar esta imagen al guardar? Las otras imágenes se conservarán.')) return;
+      gallery.splice(index, 1);
+      if (entry.primary && gallery.length) gallery[0].primary = true;
+      markDirty(); preview();
+    });
+    actions.append(up, down, primary, remove); card.append(actions); panel.append(card);
+    try {
+      const key = entry.file || entry.path;
+      if (!previews.has(key)) {
+        const task = (async () => {
+          let blob = entry.file;
+          if (!blob) {
+            const result = await client.storage.from(PACKAGE_BUCKET).download(entry.path);
+            if (result.error) throw result.error;
+            blob = result.data;
+          }
+          return URL.createObjectURL(blob);
+        })();
+        previews.set(key, task);
+      }
+      const url = await previews.get(key);
+      if (serial !== previewSerial) return;
+      img.src = url;
+    } catch { previews.delete(entry.file || entry.path); img.remove(); card.prepend(node('p', 'Vista previa no disponible.')); }
+  }
 }
+window.addEventListener('pagehide', event => {
+  if (!event.persisted) for (const promise of previews.values()) promise.then(url => URL.revokeObjectURL(url)).catch(() => {});
+});
 
 function renderProducts() {
   const options = $('product-options'); options.replaceChildren();
@@ -117,21 +148,25 @@ async function renderAssets() {
   await reconcileAssignedPackageImages(client, id);
   const rows = await packageAssets(client, id);
   const panel = $('asset-list'); panel.replaceChildren();
-  for (const asset of rows.filter(a => a.path !== savedImagePath)) {
+  for (const asset of rows.filter(a => !savedPaths.has(a.path))) {
     const row = node('div', undefined, 'package-selected');
     row.append(node('p', `${asset.path.split('/').pop()} — ${asset.state === 'uploading' ? 'Subida pendiente' : asset.state === 'deleting' ? 'Eliminación pendiente' : 'Disponible sin asignar'}`));
     const actions = node('div', undefined, 'package-actions');
     if (asset.state !== 'deleting') {
       actions.append(button(asset.state === 'uploading' ? 'Recuperar subida' : 'Usar imagen', () => operation(async () => {
         if (asset.state === 'uploading') await completePackageUpload(client, id, asset.path);
-        imagePath = asset.path; file = null; $('package-file').value = ''; markDirty();
+        if (!gallery.some(item => item.path === asset.path)) gallery.push({ path: asset.path, primary: !gallery.length });
+        markDirty();
         await preview(); await renderAssets();
         message('Imagen lista y seleccionada. Pulsa Guardar para asignarla al paquete.');
       })));
       actions.append(button('Descartar archivo', () => operation(async () => {
         if (!confirm('¿Eliminar este archivo propio sin asignar?')) return;
         await imageAction(client, id, 'discard', asset.path);
-        if (imagePath === asset.path) { imagePath = savedImagePath; await preview(); }
+        gallery = gallery.filter(item => item.path !== asset.path);
+        if (gallery.length && !gallery.some(item => item.primary)) gallery[0].primary = true;
+        markDirty();
+        await preview();
         await cleanupPackageImages(client, id); await renderAssets();
         message('Archivo descartado. Los datos del formulario no se guardaron.');
       })));
@@ -149,7 +184,7 @@ function formData() {
     name: $('package-name').value.trim(), slug: $('package-slug').value.trim(),
     description: $('package-description').value.trim() || null,
     discount_percent: discount, published: id ? $('package-published').checked : false,
-    featured: $('package-featured').checked, image_path: imagePath
+    featured: $('package-featured').checked
   };
 }
 function editingMode() {
@@ -161,7 +196,7 @@ function editingMode() {
 
 async function save() {
   const data = formData();
-  if (file) await validateImage(file);
+  for (const entry of gallery) if (entry.file) await validateImage(entry.file);
   message('Guardando…');
   // Persist an ID before uploading: later failures never create a second package.
   if (!id) {
@@ -170,26 +205,29 @@ async function save() {
     document.querySelector('h1').textContent = 'Editar paquete';
     editingMode(); setBusy(true);
   }
-  if (file) {
+  for (const entry of gallery) {
+    if (!entry.file) continue;
     try {
-      imagePath = await uploadPackageImage(client, id, file);
-      file = null; $('package-file').value = '';
+      entry.path = await uploadPackageImage(client, id, entry.file);
+      if (previews.has(entry.file)) previews.set(entry.path, previews.get(entry.file));
+      entry.file = null;
     } catch (error) {
       await renderAssets().catch(() => {});
-      throw new Error(`El paquete existe (ID ${id}); la imagen no se confirmó. ${error.message} Los cambios del formulario se conservan.`);
+      throw new Error('El paquete existe (ID ' + id + '); la galería no se guardó. ' + error.message + ' Los cambios se conservan; las subidas confirmadas no se repetirán.');
     }
   }
   await packageRpc(client, 'update_catalog_package', {
-    p_package_id: id, p_data: { ...data, image_path: imagePath }, p_product_ids: selected
+    p_package_id: id, p_data: data, p_product_ids: selected,
+    p_images: gallery.map(entry => ({ storage_path: entry.path, is_primary: entry.primary }))
   });
-  savedImagePath = imagePath; dirty = false;
+  savedPaths = new Set(gallery.map(entry => entry.path)); dirty = false;
   message('Paquete guardado.');
   try { await renderAssets(); await cleanupPackageImages(client, id); await renderAssets(); await preview(); }
   catch (error) { message(`Paquete guardado. ${error.message}`); }
 }
 
 async function deletePackage(packageId, name) {
-  const confirmation = prompt(`Eliminar «${name}» y su imagen propia. Los productos se conservarán. Escribe ELIMINAR para confirmar.`);
+  const confirmation = prompt(`Eliminar «${name}» y sus imágenes propias. Los productos se conservarán. Escribe ELIMINAR para confirmar.`);
   if (confirmation === null) return false;
   if (confirmation !== 'ELIMINAR') throw new Error('No se eliminó nada. Debes escribir ELIMINAR.');
   await packageRpc(client, 'delete_catalog_package', { p_package_id: packageId, p_confirmation: confirmation });
@@ -246,14 +284,16 @@ async function loadEditor() {
   ]);
   products = rows.map(p => ({ ...p, brandName: brands.find(b => b.id === p.brand_id)?.name || 'Sin marca' }));
   if (id) {
-    const result = await client.from('packages').select('*,package_items(product_id,position)').eq('id', id).single();
+    const result = await client.from('packages').select('*,package_items(product_id,position),package_images(storage_path,position,is_primary)').eq('id', id).single();
     if (result.error) throw new Error('No se pudo cargar el paquete. Revisa el enlace y tu acceso.');
     const pack = result.data;
     $('package-name').value = pack.name; $('package-slug').value = pack.slug; slugEdited = true;
     $('package-description').value = pack.description || ''; $('package-discount').value = pack.discount_percent;
     $('package-published').checked = pack.published; $('package-featured').checked = pack.featured;
     selected = [...pack.package_items].sort((a, b) => a.position - b.position).map(item => item.product_id);
-    imagePath = savedImagePath = pack.image_path;
+    gallery = [...pack.package_images].sort((a, b) => a.position - b.position).map(item => ({ path: item.storage_path, primary: item.is_primary }));
+    if (gallery.length && !gallery.some(item => item.primary)) gallery[0].primary = true;
+    savedPaths = new Set(gallery.map(item => item.path));
   }
   editingMode(); renderProducts(); await preview(); await renderAssets();
   form.addEventListener('input', event => { if (event.target.id !== 'product-search') markDirty(); });
@@ -263,10 +303,12 @@ async function loadEditor() {
   $('package-slug').addEventListener('blur', () => { $('package-slug').value = slugify($('package-slug').value); });
   $('product-search').addEventListener('input', renderProducts);
   $('package-file').addEventListener('change', () => {
-    file = $('package-file').files[0] || null; preview();
-  });
-  $('remove-image').addEventListener('click', () => {
-    file = null; imagePath = null; $('package-file').value = ''; markDirty(); preview();
+    const files = Array.from($('package-file').files || []);
+    operation(async () => {
+      for (const file of files) await validateImage(file);
+      for (const file of files) gallery.push({ file, path: null, primary: !gallery.length });
+      $('package-file').value = ''; markDirty(); await preview();
+    });
   });
   form.addEventListener('submit', event => { event.preventDefault(); if (form.reportValidity()) operation(save); });
   $('refresh-assets').addEventListener('click', () => operation(async () => { await renderAssets(); message('Pendientes actualizados. Los cambios del formulario se conservan.'); }));

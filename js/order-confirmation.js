@@ -1,6 +1,7 @@
+import {packagePriceLines} from './package-order.js?v=packages-polish-1';
 // Presentation only: reuse the calculated amounts without recalculating discounts.
 function confirmationSummaryLines(rows, calculation, money) {
-    const label = rows.length === 1 ? 'Subtotal' : 'Subtotal del conjunto';
+    const label = rows.some(row => row.type === 'package') ? 'Subtotal efectivo' : rows.length === 1 ? 'Subtotal' : 'Subtotal del conjunto';
     return [
         `${label}${calculation.completePrice ? '' : ' conocido'}: ${money(calculation.effectiveSubtotal)}`,
         ...(calculation.collectionDiscountTotal > 0 ? ['Descuento de colección: −' + money(calculation.collectionDiscountTotal)] : []),
@@ -19,7 +20,7 @@ function priceLines(row,money) {
 }
 
 export function buildOrderMessage(rows, calculation, money) {
-    const lines = rows.map(row => `${row.name}\nTalla: ${row.size}\nCantidad: ${row.quantity}\n${priceLines(row,money).join('\n')}`);
+    const lines = rows.map(row => row.type === 'package' ? ['Paquete: '+row.package_name, '', ...row.items.map(i => '- '+i.product_name+' — Talla '+i.size), '', ...packagePriceLines(row,money)].join('\n') : `${row.name}\nTalla: ${row.size}\nCantidad: ${row.quantity}\n${priceLines(row,money).join('\n')}`);
     return `Hola, quiero realizar el siguiente pedido:\n\n${lines.join('\n\n')}\n\n${confirmationSummaryLines(rows,calculation,money).join('\n')}`;
 }
 
@@ -70,6 +71,14 @@ export function createOrderConfirmation(money, options = {}) {
         const items = dialog.querySelector('.confirmation-items'); items.replaceChildren();
         for (const row of rows) {
             const card = append(items, 'article', '');
+            if (row.type === 'package') {
+                card.className='confirmation-package';
+                append(card, 'h3', 'Paquete: '+row.package_name);
+                const included=append(card,'ul','');
+                for (const item of row.items) append(included, 'li', item.product_name+' — Talla '+item.size);
+                for (const line of packagePriceLines(row,money)) append(card, 'p', line);
+                continue;
+            }
             append(card, 'h3', row.name);
             append(card, 'p', `Talla: ${row.size} · Cantidad: ${row.quantity}`);
             for (const line of priceLines(row,money)) append(card, 'p', line);

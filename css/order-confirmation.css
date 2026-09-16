@@ -7,3 +7,9 @@
 .confirmation-items,.confirmation-totals{overflow-wrap:anywhere}
 @media(max-width:600px){.confirmation-actions{flex-direction:column}.confirmation-actions button{width:100%;flex:auto}}
 @media(max-height:450px){.order-confirmation{padding:16px}.confirmation-items article{padding-block:12px}}
+
+.confirmation-items .confirmation-package{padding:14px 0}
+.confirmation-package ul{padding-left:18px;margin:10px 0 14px;line-height:1.45}
+.confirmation-package li{margin:6px 0;overflow-wrap:anywhere}
+.confirmation-package p{margin:6px 0;font-variant-numeric:tabular-nums}
+.confirmation-package p:last-child{font-weight:600;color:var(--color-ivory,#f3f0e9)}

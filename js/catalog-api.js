@@ -37,7 +37,13 @@ export function createCatalogApi({fetcher=globalThis.fetch, makeObjectURL=blob=>
         const timer = setTimeout(()=>controller.abort(),20000);
         try {
             const response = await fetcher(url,{headers:{apikey:publishableKey},credentials:'omit',cache:'no-store',signal:controller.signal});
-            if (!response.ok) throw new Error('No se pudo consultar el catálogo. Intenta recargar la página.');
+            if (!response.ok) {
+                const error = new Error('No se pudo consultar el catálogo. Intenta recargar la página.');
+                error.status = response.status;
+                // Keep only the error code; never expose response bodies or credentials.
+                try { const body = await response.json(); if (/^[A-Za-z0-9_]{1,40}$/.test(body.code || '')) error.code = body.code; } catch {}
+                throw error;
+            }
             return response;
         } finally { clearTimeout(timer); }
     }
@@ -52,6 +58,8 @@ export function createCatalogApi({fetcher=globalThis.fetch, makeObjectURL=blob=>
         const url = makeObjectURL(blob); urls.add(url); return url;
     }
     return {
+        // Expose transport on the API instance, not on individual products.
+        requestPublic: request,
         async loadProducts() {
             const rows=[];
             for (let offset=0;;offset+=100) {

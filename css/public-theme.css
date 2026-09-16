@@ -315,3 +315,12 @@ body.public-page { font-size: var(--font-body); }
 .public-page .cart-link [data-cart-count]{position:absolute;top:0;right:-4px;min-width:18px;padding:1px 3px;border-radius:10px;background:#dbc08d;color:#0b1720;font-size:11px;line-height:16px;text-align:center}
 .public-page #add-cart{margin-top:12px;width:100%}
 @media(max-width:380px){.public-page .navbar{gap:6px;padding-inline:10px}.public-page .navbar .logo{font-size:18px;letter-spacing:.08em}.public-page .header-tools{gap:2px}.public-page .header-tools a{width:44px;min-width:44px}.public-page .header-tools .cart-link{min-width:44px}}
+/* Five public navigation links: keep tablet navigation within the viewport. */
+@media (min-width:651px) and (max-width:1000px) {
+ .public-page .navbar { grid-template-columns:minmax(0,1fr) auto; }
+ .public-page .navbar>.logo { grid-column:1; grid-row:1; }
+ .public-page .navbar>.header-tools { grid-column:2; grid-row:1; }
+ .public-page .navbar>.nav-links { grid-column:1/-1; grid-row:2; justify-content:center; flex-wrap:wrap; gap:10px 22px; }
+ .public-page .navbar>.nav-links a { padding:10px 0 16px; }
+ .public-page .navbar>.nav-links a[aria-current="page"]::after { bottom:8px; }
+}

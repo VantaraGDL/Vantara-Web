@@ -50,13 +50,13 @@ export async function packageAssets(client, id = null) {
 }
 
 // Compare against the saved path, never the unsaved image selected in the form.
-// Keep ready records: packages.image_path references their primary key.
+// Keep ready records: package_images references their primary key.
 export async function reconcileAssignedPackageImages(client, id = null) {
   const assets = await packageAssets(client, id);
   for (const asset of assets.filter(a => a.state === 'uploading' && a.package_id !== null)) {
-    const result = await client.from('packages').select('image_path').eq('id', asset.package_id).maybeSingle();
+    const result = await client.from('package_images').select('storage_path').eq('package_id', asset.package_id).eq('storage_path', asset.path).maybeSingle();
     if (result.error) throw new Error('No se pudo comprobar la imagen asignada al paquete.');
-    if (result.data?.image_path === asset.path) {
+    if (result.data?.storage_path === asset.path) {
       await packageRpc(client, 'reconcile_package_image', { p_path: asset.path, p_finish: false });
     }
   }

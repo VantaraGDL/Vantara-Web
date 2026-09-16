@@ -574,3 +574,28 @@
 
 .quantity-control.quantity-inactive{opacity:.5}.quantity-control.quantity-inactive :is(input,button){cursor:not-allowed}
 .low-stock-note{color:var(--color-gold-hover,#d3b780);font-size:.875rem;line-height:1.5;margin:6px 0 0}.low-stock-note:empty{margin:0}
+
+/* Product-only composition; package galleries retain their own layout. */
+.producto-page .product-page{padding-inline:clamp(12px,2vw,32px)}
+.producto-page #product-detail{max-width:none;gap:clamp(16px,1.5vw,28px);align-items:start}
+.producto-page #product-detail>.order-panel{padding:clamp(16px,1.4vw,24px);align-self:start}
+.producto-page #product-detail>.order-panel .product-action{width:100%;white-space:normal;overflow-wrap:anywhere}
+.producto-page #product-detail>.order-panel #add-cart{margin-top:12px}
+@media(min-width:1200px){
+ .producto-page #product-detail{grid-template-columns:minmax(0,38fr) minmax(0,39fr) minmax(0,23fr)}
+ .producto-page #product-detail>.product-gallery{grid-column:1;grid-row:1}
+ .producto-page #product-detail>.product-data{grid-column:2;grid-row:1}
+ .producto-page #product-detail>.order-panel{grid-column:3;grid-row:1}
+}
+@media(min-width:851px){
+ .producto-page #product-detail .product-main-image{width:100%;max-width:none;height:auto;aspect-ratio:3/4;max-height:min(75svh,720px)}
+ .producto-page #product-detail .product-main-image img{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
+}
+@media(min-width:851px) and (max-width:1199px){
+ .producto-page #product-detail{grid-template-columns:minmax(0,48fr) minmax(0,52fr)}
+ .producto-page #product-detail>.product-gallery{grid-column:1;grid-row:1 / 3}
+ .producto-page #product-detail>.product-data{grid-column:2;grid-row:1}
+ .producto-page #product-detail>.order-panel{grid-column:2;grid-row:2;position:static}
+}
+/* Navigation controls exist only in the shared dialog, never over this gallery. */
+.producto-page .image-viewer .viewer-arrow{top:calc(50% + 30px);transform:translateY(-50%);width:44px;height:48px;background:rgb(8 18 29 / .78)}
