@@ -1,3 +1,4 @@
+import {setDetailMetadata,resetDetailMetadata} from './public-seo.js?v=domain-seo-1';
 import {createImageViewer} from './image-viewer.js?v=package-gallery-1';
 import {addCartItems} from './cart.js?v=packages-polish-1';
 import {createOrderConfirmation} from './order-confirmation.js?v=packages-polish-1';
@@ -28,6 +29,7 @@ const productId =
 
 const orderSelection = new Map();
 async function loadProduct() {
+    resetDetailMetadata('product');
     productDetail.hidden=true;relatedSection.hidden=true;productError.hidden=false;
     productError.querySelector('h1').textContent='Cargando producto…';
     productError.querySelector('p').textContent='';
@@ -35,8 +37,7 @@ async function loadProduct() {
         products=await catalogApi.loadProducts();
         product=products.find(p=>p.id===productId);
         if(!product){
-            document.title="Producto no encontrado | Vant'ara";
-            const robots=document.createElement('meta');robots.name='robots';robots.content='noindex';document.head.appendChild(robots);
+            resetDetailMetadata('product',true);
             productError.querySelector('h1').textContent='Producto no encontrado';
             productError.querySelector('p').textContent='El producto que buscas no existe o ya no está disponible.';
             return;
@@ -46,6 +47,7 @@ async function loadProduct() {
         renderProduct(product);renderRelatedProducts(product);
         if(products.some(p=>p.imageError))document.querySelector('#order-error').textContent='Algunas imágenes no pudieron cargarse. Puedes recargar para reintentar.';
     }catch{
+        resetDetailMetadata('product',true);
         productDetail.hidden=true;relatedSection.hidden=true;productError.hidden=false;productError.setAttribute('role','alert');
         productError.querySelector('h1').textContent='No se pudo cargar el producto';
         productError.querySelector('p').textContent='Revisa tu conexión y recarga la página para reintentar.';
@@ -182,8 +184,8 @@ function renderProduct(product) {
     `;
 
 
-    document.title = `${product.name || product.model} | Vant'ara`;
-    document.querySelector('meta[name="description"]').content = `${product.name || product.model}. Consulta sus detalles, tallas y disponibilidad en Vant'ara.`;
+    const primaryRecord=product.imageRecords?.[0];
+    setDetailMetadata('product',product,primaryRecord && !primaryRecord.bucket_id ? primaryRecord.path : null);
 
     setupSizeButtons();
     setupCollection();

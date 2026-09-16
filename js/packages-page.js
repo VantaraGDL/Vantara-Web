@@ -1,3 +1,4 @@
+import {setDetailMetadata,resetDetailMetadata} from './public-seo.js?v=domain-seo-1';
 import {addCartPackage,cartTotals} from './cart.js?v=packages-polish-1';
 import {packageOrderItem,samePackageComposition} from './package-order.js?v=packages-polish-1';
 import {createOrderConfirmation} from './order-confirmation.js?v=packages-polish-1';
@@ -62,7 +63,7 @@ const openPackageModal = detail ? createOrderConfirmation(money, {
   }
 }) : null;
 function renderDetail(pack) {
-  document.title = `${pack.name} | Vant’ara`;
+  setDetailMetadata('package',pack,pack.image);
   const selection = initialPackageSelection(pack);
   const intro = el('section', undefined, 'package-intro');
   const { element: gallery, dispose } = createPackageGallery(pack); disposeGallery = dispose;
@@ -180,12 +181,14 @@ function renderDetail(pack) {
 let loading = false, disposeGallery = () => {};
 async function load() {
   if (loading) return;
+  if(detail)resetDetailMetadata('package');
   loading = true; disposeGallery(); disposeGallery = () => {}; retry.hidden = true; root.replaceChildren(); disposePackageMedia();
   root.setAttribute('aria-busy', 'true'); notice.textContent = 'Cargando paquetes…';
   try {
     if (detail) {
       const pack = await getPackageById(new URLSearchParams(location.search).get('id'));
       if (!pack) {
+        resetDetailMetadata('package',true);
         const panel=el('section',undefined,'package-empty');
         panel.append(el('h1','Paquete no disponible'));
         const back=el('a','Ver paquetes','button package-link');back.href='paquetes.html';panel.append(back);
@@ -200,6 +203,7 @@ async function load() {
       retry.hidden = !partial;
     }
   } catch (error) {
+    if(detail)resetDetailMetadata('package',true);
     root.replaceChildren(); notice.textContent = packageLoadError(error); retry.hidden = false;
   } finally { loading = false; root.setAttribute('aria-busy', 'false'); }
 }

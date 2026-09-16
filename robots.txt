@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Allow: /admin/js/config.js
+
+Sitemap: https://vantaragdl.com/sitemap.xml
