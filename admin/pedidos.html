@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Pedidos | Vant’ara Admin</title><link rel="stylesheet" href="./css/admin.css"><link rel="stylesheet" href="./css/orders.css?v=orders-1"></head>
+<body><main><p id="message" role="status" aria-live="polite">Verificando acceso…</p>
+<section id="orders-content" hidden><header><div><h1>Pedidos</h1><p id="email"></p></div><button id="logout" type="button">Cerrar sesión</button></header>
+<nav class="order-actions" aria-label="Administración"><a href="./index.html">Panel</a><a href="./pedidos.html" aria-current="page">Pedidos</a></nav>
+<form id="filters" class="filters"><div><label for="status">Estado</label><select id="status"><option value="">Todos</option><option value="pending">Pendientes</option><option value="confirmed">Confirmados</option><option value="cancelled">Cancelados</option></select></div><div><label for="search">Buscar por folio</label><input id="search" type="search" maxlength="40" placeholder="VNT-…"></div><button type="submit">Buscar / actualizar</button></form>
+<div id="order-list" class="order-list"></div><nav class="order-actions" aria-label="Páginas de pedidos"><button id="previous" type="button" disabled>Anterior</button><span id="page"></span><button id="next" type="button" disabled>Siguiente</button></nav></section>
+<noscript>Activa JavaScript para acceder al administrador.</noscript></main><script type="module" src="./js/orders.js?v=order-confirmation-2"></script></body></html>

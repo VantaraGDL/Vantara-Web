@@ -2,8 +2,8 @@ import {getPackageById} from './packages-api.js?v=packages-polish-1';
 import {packagePriceLines} from './package-order.js?v=packages-polish-1';
 import {catalogApi} from './catalog-api.js?v=sales-1';
 import {escapeHTML} from './catalog-logic.js?v=collection-cart-2';
-import {readCart,cartKey,clearCart,removeCartItem,updateCartQuantity,reconcileCart,cartTotals,cartQuantityLimit} from './cart.js?v=packages-polish-1';
-import {createOrderConfirmation} from './order-confirmation.js?v=packages-polish-1';
+import {readCart,cartKey,clearCart,removeCartItem,updateCartQuantity,reconcileCart,cartTotals,cartQuantityLimit} from './cart.js?v=orders-public-1';
+import {createOrderConfirmation} from './order-confirmation.js?v=orders-public-1';
 const list=document.querySelector('#cart-items'),summary=document.querySelector('#cart-summary'),empty=document.querySelector('#cart-empty'),status=document.querySelector('#cart-status'),confirm=document.querySelector('#cart-confirm');
 const money=v=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:0,maximumFractionDigits:2}).format(v)+' MXN';
 let products=[],packages=new Map(),state={lines:[]},busy=false,ready=false,mutating=false,review='';
@@ -63,6 +63,7 @@ async function refresh(){
  return state.changed||state.lines.some(l=>!l.available);
 }
 const openModal=createOrderConfirmation(money,{
+ source: 'cart',
  beforeConfirm:async()=>{await refresh();render();if(!ready)throw new Error('No pudimos revisar un paquete. Cierra esta ventana y recarga el carrito.');if(signature()!==review){say('El carrito cambió. Cierra el modal y revisa el resumen actualizado.');throw new Error('Cambió el carrito o la disponibilidad. Cierra este modal y vuelve a confirmar.');}},
  onWhatsAppOpened:()=>{mutating=true;try{clearCart();state={lines:[]};render();say('Se abrió el enlace de WhatsApp y se vació el carrito.');}finally{mutating=false;}}
 });

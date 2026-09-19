@@ -120,7 +120,7 @@ export function cartTotals(lines){
   packageDiscountTotal:packageOriginal-packageFinal,finalTotal:base.finalTotal+packageFinal,total:base.total+packageFinal};
  const rows=valid.map(l=>{
   if(isPackage(l.item))return {...l.item,name:l.item.package_name};
-  const price=pricing.get(cartKey(l.item));return {type:'product',name:l.item.product_name,size:l.item.size,quantity:l.item.quantity,...price,lineSubtotal:price.price===null?null:price.price*l.item.quantity};
+  const price=pricing.get(cartKey(l.item));return {type:'product',product_id:l.item.product_id,variant_id:l.item.variant_id,name:l.item.product_name,size:l.item.size,quantity:l.item.quantity,...price,lineSubtotal:price.price===null?null:price.price*l.item.quantity};
  });
  return {calculation,rows,pricing,units:valid.reduce((n,l)=>n+(isPackage(l.item)?1:l.item.quantity),0)};
 }

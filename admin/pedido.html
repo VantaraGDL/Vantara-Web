@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Pedido | Vant’ara Admin</title><link rel="stylesheet" href="./css/admin.css"><link rel="stylesheet" href="./css/orders.css?v=orders-1"></head>
+<body><main><p id="message" role="status" aria-live="polite">Verificando acceso…</p>
+<section id="orders-content" hidden><header><div><h1>Detalle del pedido</h1><p id="email"></p></div><button id="logout" type="button">Cerrar sesión</button></header>
+<nav class="order-actions" aria-label="Administración"><a href="./index.html">Panel</a><a href="./pedidos.html">Volver a pedidos</a><button id="refresh" type="button">Actualizar</button></nav>
+<div id="order-detail"></div><div id="order-items" class="order-list"></div>
+<section id="pending-actions" class="card" hidden><h2>Gestionar pedido pendiente</h2><p>Confirmar descuenta stock. Cancelar no modifica existencias. Estas acciones no se pueden revertir desde este panel.</p><div class="order-actions"><button id="confirm-order" type="button">Confirmar pedido</button><button id="cancel-order" type="button">Cancelar pedido</button></div></section></section>
+<noscript>Activa JavaScript para acceder al administrador.</noscript></main><script type="module" src="./js/orders.js?v=order-confirmation-2"></script></body></html>

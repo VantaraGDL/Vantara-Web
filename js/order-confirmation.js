@@ -1,3 +1,4 @@
+import {prepareOrderAttempt} from './orders-api.js?v=orders-public-1';
 import {packagePriceLines} from './package-order.js?v=packages-polish-1';
 // Presentation only: reuse the calculated amounts without recalculating discounts.
 function confirmationSummaryLines(rows, calculation, money) {
@@ -35,7 +36,8 @@ export function createOrderConfirmation(money, options = {}) {
     document.body.append(dialog);
     const cancel = dialog.querySelector('.confirmation-cancel');
     const confirm = dialog.querySelector('.confirmation-submit');
-    let opener, message = '', submitted = false, cooldownUntil = 0;
+    let opener, message = '', submitted = false, cooldownUntil = 0, attempt;
+    dialog.addEventListener('cancel',event=>{if(submitted)event.preventDefault();});
     const append = (parent, tag, text) => { const node = document.createElement(tag); node.textContent = text; parent.append(node); return node; };
     cancel.addEventListener('click', () => dialog.close());
     dialog.addEventListener('close', () => {
@@ -44,19 +46,27 @@ export function createOrderConfirmation(money, options = {}) {
     });
     confirm.addEventListener('click', async () => {
         if (submitted || !dialog.open) return;
-        submitted = true; confirm.disabled = true;
-        try { await options.beforeConfirm?.(); }
-        catch(e){submitted=false;confirm.disabled=false;dialog.querySelector('.confirmation-status').textContent=e.message||'No se pudo validar el pedido. Reintenta.';return;}
-        if(!dialog.open){submitted=false;confirm.disabled=false;return;}
+        submitted = true; confirm.disabled = true; cancel.disabled = true; confirm.textContent = 'Preparando pedido…';
+        dialog.querySelector('.confirmation-status').textContent = 'Preparando pedido…';
+        const release=()=>{submitted=false;confirm.disabled=false;cancel.disabled=false;confirm.textContent='Confirmar pedido';};
+        try {
+            await options.beforeConfirm?.();
+            const order=await attempt.create();
+            render(order.rows,order.calculation);
+            message='Pedido Vant’ara\nFolio: '+order.public_code+'\n\n'+buildOrderMessage(order.rows,order.calculation,money);
+        }
+        catch(e){release();dialog.querySelector('.confirmation-status').textContent=e.message||'No pudimos confirmar el registro del pedido. Intenta nuevamente.';return;}
+        if(!dialog.open){release();return;}
         cooldownUntil = Date.now() + 1500;
         const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
         // Same-tab navigation avoids popup blockers and multiple WhatsApp windows.
         try { window.location.assign(url); dialog.close(); }
         catch {
-            submitted = false; confirm.disabled = false;
+            release();
             dialog.querySelector('.confirmation-status').textContent = 'No se pudo abrir WhatsApp. Intenta confirmar de nuevo.';
             return;
         }
+        attempt.complete();
         try { options.onWhatsAppOpened?.(); }
         catch {
             submitted = false; confirm.disabled = false;
@@ -64,10 +74,7 @@ export function createOrderConfirmation(money, options = {}) {
             window.alert('Se abrió WhatsApp, pero no se pudo vaciar el carrito. Elimínalo manualmente.');
         }
     });
-    return (rows, calculation, button) => {
-        if (dialog.open || Date.now() < cooldownUntil) return;
-        opener = button; submitted = false; confirm.disabled = false;
-        message = buildOrderMessage(rows, calculation, money);
+    function render(rows,calculation) {
         const items = dialog.querySelector('.confirmation-items'); items.replaceChildren();
         for (const row of rows) {
             const card = append(items, 'article', '');
@@ -86,7 +93,17 @@ export function createOrderConfirmation(money, options = {}) {
         const totals = dialog.querySelector('.confirmation-totals'); totals.replaceChildren();
         const summaryLines=confirmationSummaryLines(rows,calculation,money);
         summaryLines.forEach((line,index)=>append(totals,index===summaryLines.length-1?'strong':'p',line));
+    }
+    return (rows, calculation, button) => {
+        if (dialog.open || Date.now() < cooldownUntil) return;
+        opener=button;submitted=false;confirm.disabled=false;cancel.disabled=false;confirm.textContent='Confirmar pedido';
+        render(rows,calculation);
         dialog.querySelector('.confirmation-status').textContent = '';
+        try { attempt=prepareOrderAttempt(options.source||'product',rows); }
+        catch(error) {
+            attempt=null;confirm.disabled=true;
+            dialog.querySelector('.confirmation-status').textContent=error.message||'No pudimos preparar el pedido. Cierra esta ventana e intenta nuevamente.';
+        }
         dialog.showModal(); document.body.classList.add('order-confirmation-open'); cancel.focus();
     };
 }

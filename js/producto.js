@@ -1,7 +1,7 @@
 import {setDetailMetadata,resetDetailMetadata} from './public-seo.js?v=domain-seo-1';
 import {createImageViewer} from './image-viewer.js?v=package-gallery-1';
-import {addCartItems} from './cart.js?v=packages-polish-1';
-import {createOrderConfirmation} from './order-confirmation.js?v=packages-polish-1';
+import {addCartItems} from './cart.js?v=orders-public-1';
+import {createOrderConfirmation} from './order-confirmation.js?v=orders-public-1';
 import {catalogApi} from './catalog-api.js?v=sales-1';
 import {escapeHTML,getOrderPrices,getOrderPricing,isProductOnSale,getPublicVariants,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=collection-cart-2';
 import {getProductImages,createProductCard,renderProductPrice} from './product-ui.js?v=collection-cart-2';
@@ -340,7 +340,7 @@ function setupContactButton() {
         const orderPricing = getOrderPricing(selected,orderSelection);
         const rows = selected.map(item => {
             const { size, quantity } = orderSelection.get(item.id);
-            return {name: item.name || item.model, size: size || item.variants?.[0]?.size || 'No requiere talla', quantity, ...orderPricing.get(item.id), lineSubtotal:orderPricing.get(item.id).price===null?null:orderPricing.get(item.id).price*quantity};
+            return {product_id:item.id,variant_id:item.variants.find(v=>v.size===size)?.id,name: item.name || item.model, size: size || item.variants?.[0]?.size || 'No requiere talla', quantity, ...orderPricing.get(item.id), lineSubtotal:orderPricing.get(item.id).price===null?null:orderPricing.get(item.id).price*quantity};
         });
         openConfirmation(rows, calculateOrder(selected), document.querySelector('#contact-button'));
     });
