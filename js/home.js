@@ -1,5 +1,5 @@
 import {renderNewReleases} from './new-releases.js?v=releases-2';
-import {catalogApi} from './catalog-api.js?v=sales-1';
+import {catalogApi} from './catalog-api.js?v=production-fixes-1';
 import {createProductCard} from './product-ui.js?v=collection-cart-2';
 const container=document.querySelector('#featured-products');
 function setupFeaturedRow() {

@@ -1,8 +1,9 @@
 import {setDetailMetadata,resetDetailMetadata} from './public-seo.js?v=domain-seo-1';
 import {createImageViewer} from './image-viewer.js?v=package-gallery-1';
-import {addCartItems} from './cart.js?v=orders-public-1';
-import {createOrderConfirmation} from './order-confirmation.js?v=orders-public-1';
-import {catalogApi} from './catalog-api.js?v=sales-1';
+import {addCartItems} from './cart.js?v=production-fixes-1';
+import {createOrderConfirmation} from './order-confirmation.js?v=production-fixes-1';
+import {invalidateOrderAttempt} from './orders-api.js?v=production-fixes-1';
+import {catalogApi} from './catalog-api.js?v=production-fixes-1';
 import {escapeHTML,getOrderPrices,getOrderPricing,isProductOnSale,getPublicVariants,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=collection-cart-2';
 import {getProductImages,createProductCard,renderProductPrice} from './product-ui.js?v=collection-cart-2';
 let products=[],product;
@@ -264,6 +265,7 @@ function updateOrderSummary() {
 function setupCollection() {
     document.querySelectorAll('[data-outfit-select]').forEach(input => {
         input.addEventListener('change', () => {
+            invalidateOrderAttempt('product');
             const id = Number(input.dataset.outfitSelect);
             if (input.checked) orderSelection.set(id, initialSelection(products.find(p => p.id === id)));
             else orderSelection.delete(id);
@@ -293,7 +295,7 @@ function setupSizeButtons() {
             button.addEventListener('click', () => {
                 if (!orderSelection.has(id) || sizeUnavailable(item, button.dataset.size)) return;
                 const selection = orderSelection.get(id);
-                if (selection.size !== button.dataset.size) selection.quantity = 1;
+                if (selection.size !== button.dataset.size) {invalidateOrderAttempt('product');selection.quantity = 1;}
                 selection.size = button.dataset.size;
                 document.querySelectorAll(`[data-sizes-for="${id}"] .size-button`).forEach(option => {
                     const active = option.dataset.size === button.dataset.size;
@@ -520,6 +522,7 @@ function setupQuantities() {
         syncQuantityLimit(item);
         input.addEventListener('input', () => {
             if (input.disabled || !quantityReady(item)) return;
+            if(orderSelection.get(id).quantity!==input.valueAsNumber)invalidateOrderAttempt('product');
             orderSelection.get(id).quantity = input.valueAsNumber;
             updateQuantityButtons(input);
             updateOrderSummary();

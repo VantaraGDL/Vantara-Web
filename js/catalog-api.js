@@ -2,6 +2,7 @@ import {projectUrl, publishableKey} from '../admin/js/config.js?v=supabase-2';
 
 // Public requests deliberately never read the admin session or send its JWT.
 export const PRODUCT_SELECT = 'id,name,model,color,material,finish,description,price,on_sale,discount_percent,featured,new_release,created_at,published,position,requires_size,max_quantity,brands(id,name),categories(id,name),collections(id,name,discount_enabled,discount_amount,minimum_pieces),product_variants(id,size,stock,position),product_images(id,path,alt,position,bucket_id,media_state)';
+const VALIDATION_SELECT = 'id,name,model,price,on_sale,discount_percent,published,position,requires_size,max_quantity,brands(id,name),categories(id,name),collections(id,name,discount_enabled,discount_amount,minimum_pieces),product_variants(id,size,stock,position),product_images(id,path,position,bucket_id,media_state)';
 const placeholder = 'assets/img/producto-pendiente.svg';
 const byPosition = (a,b) => a.position-b.position || a.id-b.id;
 
@@ -31,7 +32,7 @@ export function transformProduct(row) {
 
 export function createCatalogApi({fetcher=globalThis.fetch, makeObjectURL=blob=>URL.createObjectURL(blob),
     revokeObjectURL=url=>URL.revokeObjectURL(url)}={}) {
-    const urls = new Set();
+    const urls = new Set(), imageCache = new Map();
     async function request(url) {
         const controller = new AbortController();
         const timer = setTimeout(()=>controller.abort(),20000);
@@ -52,34 +53,51 @@ export function createCatalogApi({fetcher=globalThis.fetch, makeObjectURL=blob=>
             return /^assets\/img\/[a-zA-Z0-9_./-]+$/.test(image.path) && !image.path.includes('..') ? image.path : placeholder;
         }
         if (image.bucket_id!=='product-images' || !new RegExp(`^products/${productId}/[0-9a-f-]{36}\\.(jpg|png|webp)$`).test(image.path)) return placeholder;
-        const response = await request(`${projectUrl}/storage/v1/object/authenticated/product-images/${image.path}`);
-        const blob = await response.blob();
-        if (!['image/jpeg','image/png','image/webp'].includes(blob.type)) throw new Error('Imagen no disponible.');
-        const url = makeObjectURL(blob); urls.add(url); return url;
+        if(!imageCache.has(image.path)) {
+            const pending=(async()=>{
+                const response = await request(`${projectUrl}/storage/v1/object/authenticated/product-images/${image.path}`);
+                const blob = await response.blob();
+                if (!['image/jpeg','image/png','image/webp'].includes(blob.type)) throw new Error('Imagen no disponible.');
+                const url = makeObjectURL(blob); urls.add(url); return url;
+            })();
+            imageCache.set(image.path,pending);
+            pending.catch(()=>{if(imageCache.get(image.path)===pending)imageCache.delete(image.path);});
+        }
+        return imageCache.get(image.path);
     }
     return {
         // Expose transport on the API instance, not on individual products.
         requestPublic: request,
-        async loadProducts() {
+        async loadProductsData({full=false}={}) {
             const rows=[];
             for (let offset=0;;offset+=100) {
-                const query = new URLSearchParams({select:PRODUCT_SELECT,published:'eq.true',order:'position.asc,id.asc',limit:'100',offset:String(offset)});
+                const query = new URLSearchParams({select:full?PRODUCT_SELECT:VALIDATION_SELECT,published:'eq.true',order:'position.asc,id.asc',limit:'100',offset:String(offset)});
                 const page=await (await request(`${projectUrl}/rest/v1/products?${query}`)).json();
                 if (!Array.isArray(page)) throw new Error('Respuesta del catálogo inválida.');
                 rows.push(...page.filter(p=>p.published===true));
                 if(page.length<100)break;
             }
-            const products=rows.map(transformProduct);
+            return rows.map(transformProduct);
+        },
+        async loadProductImages(products,{primaryOnly=false}={}) {
             // Bound concurrent downloads; failed images keep their position as placeholders.
             let next=0;
-            const jobs=products.flatMap(p=>p.imageRecords.map((image,index)=>async()=>{
+            const jobs=products.flatMap(p=>(primaryOnly?p.imageRecords.slice(0,1):p.imageRecords).map((image,index)=>async()=>{
                 try { p.images[index]=await imageURL(image,p.id); }
                 catch { p.images[index]=placeholder; p.imageError=true; }
             }));
             await Promise.all(Array.from({length:Math.min(4,jobs.length)},async()=>{while(next<jobs.length)await jobs[next++]();}));
             return products;
         },
-        dispose(){urls.forEach(revokeObjectURL);urls.clear();}
+        async loadProducts(){return this.loadProductImages(await this.loadProductsData({full:true}));},
+        releaseUnusedImages(products){
+            const keep=new Set(products.flatMap(p=>p.imageRecords.map(i=>i.path)));
+            for(const [path,pending] of imageCache)if(!keep.has(path)){
+                imageCache.delete(path);
+                pending.then(url=>{urls.delete(url);revokeObjectURL(url);},()=>{});
+            }
+        },
+        dispose(){this.releaseUnusedImages([]);urls.clear();}
     };
 }
 export const catalogApi=createCatalogApi();

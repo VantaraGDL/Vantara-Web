@@ -1,6 +1,10 @@
 import {projectUrl,publishableKey} from '../admin/js/config.js?v=supabase-2';
 
 const attempts=new Map();
+export function invalidateOrderAttempt(source){
+ attempts.delete(source);
+ try{sessionStorage.removeItem('vantara_order_attempt_'+source);}catch{}
+}
 const id=value=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<=0)throw new Error('Revisa los artículos y tallas del pedido.');return n;};
 export function orderItems(rows) {
  return rows.map(row=>{
@@ -22,16 +26,31 @@ export function prepareOrderAttempt(source,rows) {
  const signature=JSON.stringify({source,items}),storageKey='vantara_order_attempt_'+source;
  let saved=attempts.get(source);
  if(!saved){try{saved=JSON.parse(sessionStorage.getItem(storageKey));}catch{}}
- if(!saved||saved.signature!==signature||!/^[-\w]{32,200}$/.test(saved.key||''))saved={signature,key:randomKey()};
+ if(!saved||saved.signature!==signature||!/^[-\w]{32,200}$/.test(saved.key||''))saved={signature,key:randomKey(),started:false};
+ // The signature stores the immutable source/items, including across reloads.
+ const original=JSON.parse(saved.signature);
+ const payload={p_source:original.source,p_items:original.items,p_customer_name:null,p_customer_phone:null,p_idempotency_key:saved.key};
  attempts.set(source,saved);
  // Only the request identity/key, never prices, customer details or admin tokens.
  try{sessionStorage.setItem(storageKey,JSON.stringify(saved));}catch{}
  let inFlight=null;
  return {
+  get started(){return saved.started===true;},
+  get current(){return attempts.get(source)?.key===saved.key;},
+  get items(){return JSON.parse(JSON.stringify(original.items));},
   async create(){
    if(inFlight)return inFlight;
-   inFlight=register({p_source:source,p_items:items,p_customer_name:null,p_customer_phone:null,p_idempotency_key:saved.key});
-   try{return await inFlight;}finally{inFlight=null;}
+   saved.started=true;
+   try{sessionStorage.setItem(storageKey,JSON.stringify(saved));}catch{}
+   inFlight=register(payload);
+   try{return await inFlight;}
+   catch(error){
+    if(error.uncertain===false){
+     saved.started=false;
+     if(attempts.get(source)?.key===saved.key){try{sessionStorage.setItem(storageKey,JSON.stringify(saved));}catch{}}
+    }
+    throw error;
+   }finally{inFlight=null;}
   },
   complete(){if(attempts.get(source)?.key===saved.key)attempts.delete(source);try{if(JSON.parse(sessionStorage.getItem(storageKey))?.key===saved.key)sessionStorage.removeItem(storageKey);}catch{}}
  };
@@ -65,7 +84,7 @@ async function register(payload){
   const response=await fetch(projectUrl+'/rest/v1/rpc/create_catalog_order',{method:'POST',headers:{apikey:publishableKey,'Content-Type':'application/json'},credentials:'omit',cache:'no-store',body:JSON.stringify(payload),signal:controller.signal});
   if(!response.ok){
    let code='';try{const body=await response.json();code=String(body.code||'');console.error('Registro de pedido rechazado',{status:response.status,code,message:body.message});}catch{}
-   const error=new Error(response.status<500?'No pudimos registrar tu pedido. Revisa la disponibilidad, tallas y cantidades e intenta nuevamente.':'No pudimos confirmar el registro del pedido. Intenta nuevamente.');error.publicMessage=true;throw error;
+   const error=new Error(response.status<500?'No pudimos registrar tu pedido. Revisa la disponibilidad, tallas y cantidades e intenta nuevamente.':'No pudimos confirmar el registro del pedido. Intenta nuevamente.');error.publicMessage=true;error.uncertain=response.status>=500||response.status===408||response.status===429;throw error;
   }
   return normalize(await response.json());
  }catch(error){

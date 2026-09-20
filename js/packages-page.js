@@ -1,9 +1,10 @@
 import {setDetailMetadata,resetDetailMetadata} from './public-seo.js?v=domain-seo-1';
-import {addCartPackage,cartTotals} from './cart.js?v=orders-public-1';
+import {addCartPackage,cartTotals} from './cart.js?v=production-fixes-1';
 import {packageOrderItem,samePackageComposition} from './package-order.js?v=packages-polish-1';
-import {createOrderConfirmation} from './order-confirmation.js?v=orders-public-1';
+import {createOrderConfirmation} from './order-confirmation.js?v=production-fixes-1';
+import {invalidateOrderAttempt} from './orders-api.js?v=production-fixes-1';
 import {createPackageGallery} from './package-gallery.js?v=packages-polish-1';
-import { getPublishedPackages, getPackageById, disposePackageMedia, packageLoadError } from './packages-api.js?v=packages-polish-1';
+import { getPublishedPackages, getPackageById, disposePackageMedia, packageLoadError } from './packages-api.js?v=production-fixes-1';
 import { initialPackageSelection, validatePackageSelection } from './package-selection.js?v=packages-public-1';
 import { getPublicVariants } from './catalog-logic.js?v=collection-cart-2';
 
@@ -57,7 +58,7 @@ let directReview = null;
 const openPackageModal = detail ? createOrderConfirmation(money, {
   source: 'package',
   beforeConfirm: async () => {
-    const current = await getPackageById(directReview.item.package_id, {fullGallery:false}).catch(error => { throw new Error(packageLoadError(error)); });
+    const current = await getPackageById(directReview.item.package_id, {fullGallery:false,media:false}).catch(error => { throw new Error(packageLoadError(error)); });
     if (!current || !samePackageComposition(directReview.item,current)) throw new Error('Este paquete cambió o no está disponible. Vuelve a seleccionarlo.');
     const latest = packageOrderItem(current,new Map(directReview.item.items.map(i=>[i.product_id,i.variant_id])));
     if (JSON.stringify(latest)!==JSON.stringify(directReview.item)) throw new Error('El paquete cambió. Cierra esta ventana y vuelve a pedirlo.');
@@ -129,6 +130,7 @@ function renderDetail(pack) {
       button.setAttribute('aria-label', `Talla ${variant.size}${button.disabled ? ', agotada' : ''}`);
       button.addEventListener('click', () => {
         if (variant.stock <= 0) return;
+        if(selection.get(item.productId)!==variant.id)invalidateOrderAttempt('package');
         selection.set(item.productId, variant.id); sync();
       });
       buttons.append(button);
@@ -152,7 +154,7 @@ function renderDetail(pack) {
     if(actionBusy||blocked)return;
     actionBusy=true;update();feedback.textContent='Revisando tu paquete…';
     try{
-      const current=await getPackageById(pack.id,{fullGallery:false});
+      const current=await getPackageById(pack.id,{fullGallery:false,media:false});
       if(!current){blocked=true;throw new Error('Este paquete ya no está disponible.');}
       if(!samePackageComposition({items:pack.items},current)){blocked=true;throw new Error('Este paquete cambió. Recarga y elige tus tallas.');}
       const item=packageOrderItem(current,selection);

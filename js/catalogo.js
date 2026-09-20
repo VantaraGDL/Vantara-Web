@@ -1,4 +1,4 @@
-import {catalogApi} from './catalog-api.js?v=sales-1';
+import {catalogApi} from './catalog-api.js?v=production-fixes-1';
 import {getTotalStock,getProductPrice} from './catalog-logic.js?v=collection-cart-2';
 import {createProductCard} from './product-ui.js?v=collection-cart-2';
 let products=[];
@@ -28,8 +28,7 @@ const catalogCount =
 
 
 const requestedCategory = new URLSearchParams(window.location.search).get("category");
-let selectedCategory = Array.from(categoryFilter.options).some(option => option.value === requestedCategory)
-    ? requestedCategory : "all";
+let selectedCategory = "all";
 categoryFilter.value = selectedCategory;
 const requestedBrand = new URLSearchParams(window.location.search).get("brand")?.trim();
 let selectedBrand = requestedBrand || "all";
@@ -371,6 +370,8 @@ async function loadCatalog() {
         if(requestedBrand && !brandOptions.some(o=>o.value===requestedBrand))brandOptions.push(option(requestedBrand,requestedBrand));
         const known=new Set([...categoryFilter.options].map(o=>o.value));
         for(const p of products)if(!known.has(p.category)){categoryFilter.append(option(p.category,p.categoryName));known.add(p.category);}
+        selectedCategory = [...categoryFilter.options].some(o=>o.value===requestedCategory) ? requestedCategory : 'all';
+        categoryFilter.value = selectedCategory;
         noProductsMessage.textContent=products.length ? 'No se encontraron productos con estos filtros.' : 'No hay productos disponibles por el momento.';
         updateBrandOptions();renderCatalog();
         if(products.some(p=>p.imageError))catalogCount.textContent+=' · Algunas imágenes no pudieron cargarse.';

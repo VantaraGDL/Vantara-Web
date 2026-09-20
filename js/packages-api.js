@@ -1,5 +1,5 @@
 import { projectUrl } from '../admin/js/config.js?v=supabase-2';
-import { createCatalogApi } from './catalog-api.js?v=packages-load-2';
+import { createCatalogApi } from './catalog-api.js?v=production-fixes-1';
 
 const catalog = createCatalogApi();
 const request = catalog.requestPublic;
@@ -58,10 +58,10 @@ async function galleryURLs(row, fullGallery) {
   return images.length ? images : [placeholder];
 }
 
-async function hydrate(rows, fullGallery = false, publishedProducts = null) {
+async function hydrate(rows, fullGallery = false, publishedProducts = null, media = true) {
   if (!rows.length) return [];
   let products = [], productError = null;
-  try { products = publishedProducts ?? await catalog.loadProducts(); }
+  try { products = publishedProducts ?? await (media ? catalog.loadProducts() : catalog.loadProductsData()); }
   catch (error) { productError = packageLoadError(error, 'productos publicados'); }
   const byId = new Map(products.map(p => [p.id, p]));
   const result = new Array(rows.length);
@@ -79,7 +79,7 @@ async function hydrate(rows, fullGallery = false, publishedProducts = null) {
       const complete = items.length >= 2 && items.every(i => i.product && i.product.price !== null) && pricing?.complete_price === true
         && pricing.original_subtotal !== null && pricing.final_total !== null
         && Number.isFinite(Number(pricing.original_subtotal)) && Number.isFinite(Number(pricing.final_total));
-      const images = await galleryURLs(row, fullGallery);
+      const images = media ? await galleryURLs(row, fullGallery) : [placeholder];
       result[index] = {
         id: Number(row.id), name: row.name, description: row.description || '',
         discountPercent: row.discount_percent, image: images[0], images, items, loadError,
@@ -104,13 +104,15 @@ export async function getPublishedPackages() {
   return hydrate(rows);
 }
 
-export async function getPackageById(id, { fullGallery = true, products = null } = {}) {
+export async function getPackageById(id, { fullGallery = true, products = null, media = true } = {}) {
   if (!validPackageId(id)) return null;
   const query = new URLSearchParams({ select, published: 'eq.true', id: `eq.${Number(id)}`, limit: '1' });
   const rows = await (await request(`${projectUrl}/rest/v1/packages?${query}`)).json();
   if (!Array.isArray(rows)) throw new Error('Respuesta de paquetes inválida.');
-  return (await hydrate(rows.filter(p => p.published === true), fullGallery, products))[0] || null;
+  return (await hydrate(rows.filter(p => p.published === true), fullGallery, products, media))[0] || null;
 }
+
+export const loadPackagePrimaryImage=pack=>imageURL({id:pack.id,image_path:pack.imagePath});
 
 export function disposePackageMedia() {
   urls.forEach(url => URL.revokeObjectURL(url)); urls.clear(); imageCache.clear(); catalog.dispose();

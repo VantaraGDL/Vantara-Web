@@ -1,4 +1,4 @@
-import {prepareOrderAttempt} from './orders-api.js?v=orders-public-1';
+import {prepareOrderAttempt} from './orders-api.js?v=production-fixes-1';
 import {packagePriceLines} from './package-order.js?v=packages-polish-1';
 // Presentation only: reuse the calculated amounts without recalculating discounts.
 function confirmationSummaryLines(rows, calculation, money) {
@@ -50,7 +50,10 @@ export function createOrderConfirmation(money, options = {}) {
         dialog.querySelector('.confirmation-status').textContent = 'Preparando pedido…';
         const release=()=>{submitted=false;confirm.disabled=false;cancel.disabled=false;confirm.textContent='Confirmar pedido';};
         try {
-            await options.beforeConfirm?.();
+            if(!attempt.current)throw new Error('Tu selección cambió. Cierra este modal y revisa tu pedido.');
+            options.checkSelection?.();
+            if(!attempt.started)await options.beforeConfirm?.();
+            if(!attempt.current)throw new Error('Tu selección cambió. Cierra este modal y revisa tu pedido.');
             const order=await attempt.create();
             render(order.rows,order.calculation);
             message='Pedido Vant’ara\nFolio: '+order.public_code+'\n\n'+buildOrderMessage(order.rows,order.calculation,money);
@@ -67,7 +70,7 @@ export function createOrderConfirmation(money, options = {}) {
             return;
         }
         attempt.complete();
-        try { options.onWhatsAppOpened?.(); }
+        try { options.onWhatsAppOpened?.(attempt.items); }
         catch {
             submitted = false; confirm.disabled = false;
             dialog.querySelector('.confirmation-status').textContent = 'Se abrió WhatsApp, pero no se pudo limpiar el carrito.';
