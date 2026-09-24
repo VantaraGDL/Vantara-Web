@@ -1,4 +1,4 @@
-import {prepareOrderAttempt} from './orders-api.js?v=production-fixes-1';
+import {prepareOrderAttempt} from './orders-api.js?v=order-security-1';
 import {packagePriceLines} from './package-order.js?v=packages-polish-1';
 // Presentation only: reuse the calculated amounts without recalculating discounts.
 function confirmationSummaryLines(rows, calculation, money) {

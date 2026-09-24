@@ -2,9 +2,9 @@ import {getPackageById,loadPackagePrimaryImage} from './packages-api.js?v=produc
 import {packagePriceLines} from './package-order.js?v=packages-polish-1';
 import {catalogApi} from './catalog-api.js?v=production-fixes-1';
 import {escapeHTML} from './catalog-logic.js?v=collection-cart-2';
-import {readCart,cartKey,clearCart,removeSubmittedCartItems,cartFingerprint,removeCartItem,updateCartQuantity,reconcileCart,cartTotals,cartQuantityLimit} from './cart.js?v=production-fixes-1';
-import {createOrderConfirmation} from './order-confirmation.js?v=production-fixes-1';
-import {invalidateOrderAttempt} from './orders-api.js?v=production-fixes-1';
+import {readCart,cartKey,clearCart,removeSubmittedCartItems,cartFingerprint,removeCartItem,updateCartQuantity,reconcileCart,cartTotals,cartQuantityLimit} from './cart.js?v=order-security-1';
+import {createOrderConfirmation} from './order-confirmation.js?v=order-security-1';
+import {invalidateOrderAttempt} from './orders-api.js?v=order-security-1';
 const list=document.querySelector('#cart-items'),summary=document.querySelector('#cart-summary'),empty=document.querySelector('#cart-empty'),status=document.querySelector('#cart-status'),confirm=document.querySelector('#cart-confirm');
 const money=v=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:0,maximumFractionDigits:2}).format(v)+' MXN';
 let products=[],packages=new Map(),state={lines:[]},busy=false,ready=false,mutating=false,review='',reviewSelection='';

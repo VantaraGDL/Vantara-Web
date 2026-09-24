@@ -1,8 +1,8 @@
 import {setDetailMetadata,resetDetailMetadata} from './public-seo.js?v=domain-seo-1';
-import {addCartPackage,cartTotals} from './cart.js?v=production-fixes-1';
+import {addCartPackage,cartTotals} from './cart.js?v=order-security-1';
 import {packageOrderItem,samePackageComposition} from './package-order.js?v=packages-polish-1';
-import {createOrderConfirmation} from './order-confirmation.js?v=production-fixes-1';
-import {invalidateOrderAttempt} from './orders-api.js?v=production-fixes-1';
+import {createOrderConfirmation} from './order-confirmation.js?v=order-security-1';
+import {invalidateOrderAttempt} from './orders-api.js?v=order-security-1';
 import {createPackageGallery} from './package-gallery.js?v=packages-polish-1';
 import { getPublishedPackages, getPackageById, disposePackageMedia, packageLoadError } from './packages-api.js?v=production-fixes-1';
 import { initialPackageSelection, validatePackageSelection } from './package-selection.js?v=packages-public-1';

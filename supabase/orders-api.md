@@ -59,4 +59,4 @@ Lectura administrativa: `orders` y `order_items`, protegidas por RLS. Sin escrit
 
 Los IDs de catálogo y administradores se conservan como referencias históricas sin borrado en cascada. Los items sí tienen FK al pedido. Esto permite conservar el historial aunque después se elimine un producto, variante, paquete o usuario.
 
-Para el futuro acceso público, considerar control de abuso y reintentos antes de conectar el CTA. Esta fase no introduce reservas, pagos, devoluciones, ni verificación de envío de WhatsApp.
+La creación pública incorpora cuotas server-side de pedidos nuevos después del lookup idempotente. Un exceso devuelve HTTP 429 con `Retry-After`; conservar el payload y la clave para reintentar. Ver [order-abuse-protection.md](order-abuse-protection.md) para límites, privacidad y operación. No se introducen reservas, pagos, devoluciones ni verificación de envío de WhatsApp.

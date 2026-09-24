@@ -1,8 +1,8 @@
 import {setDetailMetadata,resetDetailMetadata} from './public-seo.js?v=domain-seo-1';
 import {createImageViewer} from './image-viewer.js?v=package-gallery-1';
-import {addCartItems} from './cart.js?v=production-fixes-1';
-import {createOrderConfirmation} from './order-confirmation.js?v=production-fixes-1';
-import {invalidateOrderAttempt} from './orders-api.js?v=production-fixes-1';
+import {addCartItems} from './cart.js?v=order-security-1';
+import {createOrderConfirmation} from './order-confirmation.js?v=order-security-1';
+import {invalidateOrderAttempt} from './orders-api.js?v=order-security-1';
 import {catalogApi} from './catalog-api.js?v=production-fixes-1';
 import {escapeHTML,getOrderPrices,getOrderPricing,isProductOnSale,getPublicVariants,productSizes,sizeUnavailable,variantStock,knownPrice,quantityLimit,calculateOrder as orderTotals} from './catalog-logic.js?v=collection-cart-2';
 import {getProductImages,createProductCard,renderProductPrice} from './product-ui.js?v=collection-cart-2';

@@ -1,6 +1,6 @@
 import {getPublicVariants,getOriginalPrice,getProductPrice,calculateOrder,getOrderPricing} from './catalog-logic.js?v=collection-cart-2';
 import {packageOrderItem,samePackageComposition} from './package-order.js?v=packages-polish-1';
-import {invalidateOrderAttempt} from './orders-api.js?v=production-fixes-1';
+import {invalidateOrderAttempt} from './orders-api.js?v=order-security-1';
 const KEY='vantara_cart_v1';
 const isPackage=i=>i.type==='package';
 const positiveId=n=>Number.isSafeInteger(n)&&n>0;

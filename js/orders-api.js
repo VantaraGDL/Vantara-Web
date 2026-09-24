@@ -83,6 +83,10 @@ async function register(payload){
  try{
   const response=await fetch(projectUrl+'/rest/v1/rpc/create_catalog_order',{method:'POST',headers:{apikey:publishableKey,'Content-Type':'application/json'},credentials:'omit',cache:'no-store',body:JSON.stringify(payload),signal:controller.signal});
   if(!response.ok){
+   if(response.status===429){
+    const error=new Error('Hay demasiados intentos en este momento. Espera un momento e inténtalo de nuevo.');
+    error.publicMessage=true;error.uncertain=true;throw error;
+   }
    let code='';try{const body=await response.json();code=String(body.code||'');console.error('Registro de pedido rechazado',{status:response.status,code,message:body.message});}catch{}
    const error=new Error(response.status<500?'No pudimos registrar tu pedido. Revisa la disponibilidad, tallas y cantidades e intenta nuevamente.':'No pudimos confirmar el registro del pedido. Intenta nuevamente.');error.publicMessage=true;error.uncertain=response.status>=500||response.status===408||response.status===429;throw error;
   }
